@@ -15,6 +15,12 @@ import javax.inject.Inject
 class MessageViewModel @Inject constructor(
     private val getMessageUseCase: GetMessageUseCase
 ) : ViewModel() {
+    var messageContent by mutableStateOf("")
+        private set
+
+    fun onMessageChange(newValue: String) {
+        messageContent = newValue
+    }
 
     var uiState by mutableStateOf(MessageUiState())
         private set
@@ -33,5 +39,10 @@ class MessageViewModel @Inject constructor(
                 uiState = uiState.copy(error = e.message ?: "Unknown error", isLoading = false)
             }
         }
+    }
+
+    fun sendMessage() {
+        //send message
+        messageContent = ""
     }
 }

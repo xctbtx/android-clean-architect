@@ -3,9 +3,9 @@
 /app/google-services.json
 /local.properties
 .DS_Store
-/build
 /captures
 .externalNativeBuild
 .cxx
 local.properties
 /.idea/
+/app/build/

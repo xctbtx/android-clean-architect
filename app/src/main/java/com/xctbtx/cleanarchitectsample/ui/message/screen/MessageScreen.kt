@@ -1,19 +1,23 @@
 package com.xctbtx.cleanarchitectsample.ui.message.screen
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -59,14 +63,30 @@ fun MessageScreen(
                 }
             }
 
-            else -> MessageList(messages = state.messages, modifier = Modifier.padding(padding))
+            else -> {
+                Column(modifier = Modifier
+                    .fillMaxSize()
+                    .then(Modifier.padding(padding))) {
+                    MessageList(
+                        messages = state.messages,
+                        modifier = Modifier
+                            .weight(9f)
+                            .fillMaxWidth()
+                    )
+                    ChatBox(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    )
+                }
+            }
         }
     }
 }
 
 @Composable
 fun MessageList(messages: List<MessageUiModel>, modifier: Modifier = Modifier) {
-    LazyColumn(modifier = modifier.fillMaxSize()) {
+    LazyColumn(modifier = modifier) {
         items(messages) { message ->
             MessageItem(message)
             HorizontalDivider()
@@ -81,13 +101,23 @@ fun MessageItem(message: MessageUiModel) {
             model = message.image,
             contentDescription = "Ảnh từ internet",
             modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp),
+                .width(50.dp)
+                .height(50.dp),
             placeholder = painterResource(R.drawable.ic_launcher_foreground),
             error = painterResource(R.drawable.ic_launcher_foreground),
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.FillBounds
         )
         //display message
         Text(text = message.content, style = MaterialTheme.typography.bodyMedium)
+    }
+}
+
+@Composable
+fun ChatBox(viewModel: MessageViewModel = hiltViewModel(), modifier: Modifier) {
+    Row(modifier = modifier.then(Modifier.padding(10.dp))) {
+        TextField(viewModel.messageContent, viewModel::onMessageChange)
+        Button(onClick = {
+            viewModel.sendMessage()
+        }) { Text("Send") }
     }
 }
