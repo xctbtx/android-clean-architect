@@ -5,4 +5,5 @@ import com.xctbtx.cleanarchitectsample.domain.conversation.model.Conversation
 
 interface ConversationRepository {
     suspend fun getConversations(): List<Conversation>
+    fun syncConversations(onConversationChanged: (List<Conversation>) -> Unit)
 }

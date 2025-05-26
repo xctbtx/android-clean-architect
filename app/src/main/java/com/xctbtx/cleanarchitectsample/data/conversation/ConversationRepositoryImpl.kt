@@ -17,4 +17,13 @@ class ConversationRepositoryImpl @Inject constructor(
             it.toDomain()
         }
     }
+
+    override fun syncConversations(onConversationChanged: (List<Conversation>) -> Unit) {
+        api.syncConversations { list ->
+            val processedList = list.map {
+                it.toDomain()
+            }
+            onConversationChanged.invoke(processedList)
+        }
+    }
 }

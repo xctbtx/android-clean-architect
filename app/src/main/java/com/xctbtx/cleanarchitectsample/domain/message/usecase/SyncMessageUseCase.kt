@@ -4,10 +4,10 @@ import com.xctbtx.cleanarchitectsample.domain.message.model.Message
 import com.xctbtx.cleanarchitectsample.domain.message.repository.MessageRepository
 import javax.inject.Inject
 
-class GetMessageUseCase @Inject constructor(
+class SyncMessageUseCase @Inject constructor(
     private val messageRepo: MessageRepository,
 ) {
-    suspend operator fun invoke(conversationId: String): List<Message> {
-        return messageRepo.getMessages(conversationId)
+    operator fun invoke(conversationId: String, onMessageChanged: (List<Message>) -> Unit) {
+        messageRepo.syncMessages(conversationId, onMessageChanged)
     }
 }

@@ -20,8 +20,36 @@ class FireStoreApiServiceImpl @Inject constructor(val api: FirebaseFirestore) :
         return response.toObjects(ConversationDto::class.java)
     }
 
-    override suspend fun getMessages(): List<MessageDto> {
+    override fun syncConversations(onConversationChanged: (List<ConversationDto>) -> Unit) {
+        api.collection(Constants.CONVERSATION_PATH)
+            .addSnapshotListener { snapshot, exception ->
+                if (exception == null && snapshot != null) {
+                    onConversationChanged(snapshot.toObjects(ConversationDto::class.java))
+                } else {
+                    Log.d(TAG, "syncConversations: Error : ${exception?.message}")
+                }
+            }
+    }
+
+    override fun syncMessages(
+        conversationId: String,
+        onMessageChanged: (List<MessageDto>) -> Unit
+    ) {
+        api.collection(Constants.MESSAGE_PATH)
+            .whereEqualTo("conversationId", conversationId)
+            .orderBy(Constants.ORDER_BY_PARAM)
+            .addSnapshotListener { snapshot, exception ->
+                if (exception == null && snapshot != null) {
+                    onMessageChanged(snapshot.toObjects(MessageDto::class.java))
+                } else {
+                    Log.d(TAG, "syncMessages: Error : ${exception?.message}")
+                }
+            }
+    }
+
+    override suspend fun getMessages(conversationId: String): List<MessageDto> {
         val response = api.collection(Constants.MESSAGE_PATH)
+            .whereEqualTo("conversationId", conversationId)
             .orderBy(Constants.ORDER_BY_PARAM)
             .get()
             .await()
@@ -36,6 +64,24 @@ class FireStoreApiServiceImpl @Inject constructor(val api: FirebaseFirestore) :
             .await()
         Log.d(TAG, "getUser: $response")
         return response.toObject(UserDto::class.java) ?: UserDto()
+    }
+
+    override fun addUser(payload: UserDto) {
+        api.collection(Constants.USER_PATH).add(payload).addOnCompleteListener {
+            Log.d(TAG, "addUser: Success.")
+        }
+    }
+
+    override fun sendMessage(payload: MessageDto) {
+        api.collection(Constants.MESSAGE_PATH).add(payload).addOnCompleteListener {
+            Log.d(TAG, "addUser: Success.")
+        }
+    }
+
+    override fun addConversation(payload: ConversationDto) {
+        api.collection(Constants.CONVERSATION_PATH).add(payload).addOnCompleteListener {
+            Log.d(TAG, "addUser: Success.")
+        }
     }
 
     companion object {

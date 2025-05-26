@@ -1,7 +1,6 @@
 package com.xctbtx.cleanarchitectsample.ui.conversation.screen
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,9 +9,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -22,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.xctbtx.cleanarchitectsample.domain.conversation.model.Conversation
 import com.xctbtx.cleanarchitectsample.ui.conversation.viewmodel.ConversationViewModel
 import com.xctbtx.cleanarchitectsample.ui.navigation.Routes
@@ -64,6 +66,11 @@ fun ConversationScreen(
                 modifier = Modifier.padding(padding)
             )
         }
+        FloatingActionButton(
+            onClick = { navController.navigate(Routes.NEW_CONVERSATION) },
+        ) {
+            Icon(Icons.Filled.Add, "Floating action button.")
+        }
     }
 }
 
@@ -87,7 +94,7 @@ fun ConversationItem(navController: NavHostController, conversation: Conversatio
         modifier = Modifier
             .padding(16.dp)
             .clickable {
-                navController.navigate(Routes.MESSAGE)
+                navController.navigate(Routes.MESSAGE, )
             }) {
         //display conversation
         //conversation.icon

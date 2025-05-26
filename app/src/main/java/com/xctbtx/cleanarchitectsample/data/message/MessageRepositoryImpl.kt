@@ -10,11 +10,23 @@ class MessageRepositoryImpl @Inject constructor(
     private val api: FireStoreApiService,
 ) : MessageRepository {
 
-    override suspend fun getMessages(): List<Message> {
-        val response = api.getMessages()
+    override suspend fun getMessages(conversationId: String): List<Message> {
+        val response = api.getMessages(conversationId)
 
         return response.map {
             it.toDomain()
+        }
+    }
+
+    override fun syncMessages(
+        conversationId: String,
+        onMessageChanged: (List<Message>) -> Unit
+    ) {
+        api.syncMessages(conversationId) { messages ->
+            val processedList = messages.map {
+                it.toDomain()
+            }
+            onMessageChanged.invoke(processedList)
         }
     }
 }

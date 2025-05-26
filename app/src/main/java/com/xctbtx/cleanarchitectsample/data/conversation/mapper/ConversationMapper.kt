@@ -8,7 +8,8 @@ object ConversationMapper {
         return Conversation(
             id = this.id,
             title = this.title,
-            icon = this.icon
+            icon = this.icon,
+            participants = this.participants
         )
     }
 }

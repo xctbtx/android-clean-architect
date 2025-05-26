@@ -1,57 +1,57 @@
 package com.xctbtx.cleanarchitectsample.ui.main.screen
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarDefaults
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
-import com.xctbtx.cleanarchitectsample.ui.navigation.Routes
+import androidx.navigation.compose.rememberNavController
+import com.xctbtx.cleanarchitectsample.ui.navigation.AppNavGraph
+import com.xctbtx.cleanarchitectsample.ui.navigation.Destination
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
-fun MainScreen(navController: NavHostController) {
+fun HomeScreen(){
+    Text("Main screen")
+}
+
+@Composable
+fun MainScaffold(modifier: Modifier = Modifier) {
+    val navController = rememberNavController()
+    val startDestination = Destination.HOME
+    var selectedDestination by rememberSaveable { mutableIntStateOf(startDestination.ordinal) }
     Scaffold(
-        topBar = {
-            TopAppBar(title = {
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = "Main Screen",
-                    textAlign = TextAlign.Center
-                )
-            })
-        }
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(text = "Welcome to the app!")
-            Spacer(modifier = Modifier.height(24.dp))
-            Button(onClick = {
-                navController.navigate(Routes.POST)
-            }) {
-                Text("Go to Posts")
-            }
-            Button(onClick = {
-                navController.navigate(Routes.CONVERSATION)
-            }) {
-                Text("Go to Chats")
+        modifier = modifier,
+        bottomBar = {
+            NavigationBar(windowInsets = NavigationBarDefaults.windowInsets) {
+                Destination.entries.filter { it.isBottomEntry }
+                    .forEachIndexed { index, destination ->
+                        NavigationBarItem(
+                            selected = selectedDestination == index,
+                            onClick = {
+                                navController.navigate(route = destination.route)
+                                selectedDestination = index
+                            },
+                            icon = {
+                                Icon(
+                                    destination.icon,
+                                    contentDescription = destination.contentDescription
+                                )
+                            },
+                            label = { Text(destination.label) }
+                        )
+                    }
             }
         }
+    ) { contentPadding ->
+        AppNavGraph(navController, startDestination, modifier = Modifier.padding(contentPadding))
     }
 }

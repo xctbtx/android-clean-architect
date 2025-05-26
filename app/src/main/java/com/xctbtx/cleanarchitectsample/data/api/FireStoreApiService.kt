@@ -7,6 +7,11 @@ import com.xctbtx.cleanarchitectsample.data.user.dto.UserDto
 interface FireStoreApiService {
 
     suspend fun getConversations(): List<ConversationDto>
-    suspend fun getMessages(): List<MessageDto>
+    fun syncConversations(onConversationChanged: (List<ConversationDto>) -> Unit)
+    suspend fun getMessages(conversationId: String): List<MessageDto>
+    fun syncMessages(conversationId: String, onMessageChanged: (List<MessageDto>) -> Unit)
     suspend fun getUser(id: String): UserDto
+    fun addUser(payload: UserDto)
+    fun sendMessage(payload: MessageDto)
+    fun addConversation(payload: ConversationDto)
 }
