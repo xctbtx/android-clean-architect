@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.hilt.gradle)
     alias(libs.plugins.firebase.gradle)
     id("kotlin-kapt")
+    id("kotlin-parcelize")
 }
 
 android {

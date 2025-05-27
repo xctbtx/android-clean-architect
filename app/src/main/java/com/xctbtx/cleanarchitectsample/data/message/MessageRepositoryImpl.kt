@@ -1,6 +1,8 @@
 package com.xctbtx.cleanarchitectsample.data.message
 
+import com.xctbtx.cleanarchitectsample.data.ApiCallBack
 import com.xctbtx.cleanarchitectsample.data.api.FireStoreApiService
+import com.xctbtx.cleanarchitectsample.data.message.dto.MessageDto
 import com.xctbtx.cleanarchitectsample.data.message.mapper.MessageMapper.toDomain
 import com.xctbtx.cleanarchitectsample.domain.message.model.Message
 import com.xctbtx.cleanarchitectsample.domain.message.repository.MessageRepository
@@ -28,5 +30,9 @@ class MessageRepositoryImpl @Inject constructor(
             }
             onMessageChanged.invoke(processedList)
         }
+    }
+
+    override fun sendMessage(payload: MessageDto, apiCallBack: ApiCallBack) {
+        api.sendMessage(payload, apiCallBack)
     }
 }

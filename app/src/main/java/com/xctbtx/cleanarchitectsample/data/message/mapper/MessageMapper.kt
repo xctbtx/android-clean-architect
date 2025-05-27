@@ -23,7 +23,16 @@ object MessageMapper {
         )
     }
 
-    fun mapToUiModel(messages: List<Message>, avatarMap: Map<String, String>): List<MessageUiModel> {
+    fun Message.toDto(): MessageDto {
+        return MessageDto(
+
+        )
+    }
+
+    fun mapToUiModel(
+        messages: List<Message>,
+        avatarMap: Map<String, String>
+    ): List<MessageUiModel> {
         return messages.map {
             MessageUiModel(
                 id = it.id,

@@ -20,25 +20,30 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.xctbtx.cleanarchitectsample.R
+import com.xctbtx.cleanarchitectsample.domain.conversation.model.Conversation
 import com.xctbtx.cleanarchitectsample.ui.message.model.MessageUiModel
 import com.xctbtx.cleanarchitectsample.ui.message.viewmodel.MessageViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageScreen(
-    navController: NavHostController,
     viewModel: MessageViewModel = hiltViewModel()
 ) {
+    val conversation =
+        rememberNavController().previousBackStackEntry?.savedStateHandle?.get<Conversation>("conversation")
+    LaunchedEffect(conversation?.id) {
+        viewModel.loadMessages(conversation?.id ?: "", conversation?.participants ?: listOf())
+    }
     val state = viewModel.uiState
-
     Scaffold(
         topBar = {
             TopAppBar(title = { Text("Posts") })
@@ -64,9 +69,11 @@ fun MessageScreen(
             }
 
             else -> {
-                Column(modifier = Modifier
-                    .fillMaxSize()
-                    .then(Modifier.padding(padding))) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .then(Modifier.padding(padding))
+                ) {
                     MessageList(
                         messages = state.messages,
                         modifier = Modifier
@@ -114,7 +121,7 @@ fun MessageItem(message: MessageUiModel) {
 
 @Composable
 fun ChatBox(viewModel: MessageViewModel = hiltViewModel(), modifier: Modifier) {
-    Row(modifier = modifier.then(Modifier.padding(10.dp))) {
+    Row {
         TextField(viewModel.messageContent, viewModel::onMessageChange)
         Button(onClick = {
             viewModel.sendMessage()

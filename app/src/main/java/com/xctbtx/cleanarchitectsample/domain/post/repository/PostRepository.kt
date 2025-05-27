@@ -4,4 +4,5 @@ import com.xctbtx.cleanarchitectsample.domain.post.model.Post
 
 interface PostRepository {
     suspend fun getPosts(): List<Post>
+    suspend fun addPost(payload: Post)
 }

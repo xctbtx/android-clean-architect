@@ -1,29 +1,30 @@
 package com.xctbtx.cleanarchitectsample.ui.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Create
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.MailOutline
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.Email
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.compose.ui.graphics.vector.ImageVector
 import com.xctbtx.cleanarchitectsample.ui.conversation.screen.ConversationScreen
 import com.xctbtx.cleanarchitectsample.ui.conversation.screen.NewConversationScreen
-import com.xctbtx.cleanarchitectsample.ui.main.screen.HomeScreen
+import com.xctbtx.cleanarchitectsample.ui.menu.screen.MenuScreen
 import com.xctbtx.cleanarchitectsample.ui.message.screen.MessageScreen
 import com.xctbtx.cleanarchitectsample.ui.post.screen.PostScreen
+import com.xctbtx.cleanarchitectsample.ui.user.screen.UsersScreen
 
 object Routes {
-    const val HOME = "home"
     const val POST = "posts"
     const val CONVERSATION = "conversation"
     const val NEW_CONVERSATION = "new_conversation"
     const val MESSAGE = "message"
+    const val MENU = "message"
+    const val USER = "message"
 }
 
 @Composable
@@ -34,16 +35,18 @@ fun AppNavGraph(
 ) {
     NavHost(
         navController,
-        startDestination = startDestination.route
+        startDestination = startDestination.route,
+        modifier = modifier
     ) {
         Destination.entries.forEach { destination ->
             composable(destination.route) {
                 when (destination) {
-                    Destination.HOME -> HomeScreen()
                     Destination.CONVERSATION -> ConversationScreen(navController)
-                    Destination.NEW_CONVERSATION -> NewConversationScreen(navController)
-                    Destination.MESSAGE -> MessageScreen(navController)
+                    Destination.NEW_CONVERSATION -> NewConversationScreen()
+                    Destination.MESSAGE -> MessageScreen()
                     Destination.POSTS -> PostScreen()
+                    Destination.MENU -> MenuScreen()
+                    Destination.USER -> UsersScreen()
                 }
             }
         }
@@ -52,20 +55,15 @@ fun AppNavGraph(
 
 enum class Destination(
     val route: String,
-    val label: String,
-    val icon: ImageVector,
-    val contentDescription: String,
-    val isBottomEntry: Boolean = true
+    val label: String = "",
+    val contentDescription: String = "",
+    val isBottomEntry: Boolean = true,
+    val icon: ImageVector = Icons.Default.Home
 ) {
-    CONVERSATION(Routes.CONVERSATION, "Chat", Icons.Default.Email, "Conversation"),
-    HOME(Routes.HOME, "Home", Icons.Default.Home, "Home"),
-    MESSAGE(Routes.MESSAGE, "Message", Icons.Default.MailOutline, "Message", isBottomEntry = false),
-    NEW_CONVERSATION(
-        Routes.NEW_CONVERSATION,
-        "Conversation",
-        Icons.Default.Create,
-        "New Conversation",
-        isBottomEntry = false
-    ),
-    POSTS(Routes.POST, "Posts", Icons.Default.Person, "Posts")
+    CONVERSATION(Routes.CONVERSATION, "Chat", "Conversation", icon = Icons.Outlined.Email),
+    POSTS(Routes.POST, "Posts", "Posts", icon = Icons.Default.Person),
+    MENU(Routes.MENU, "Menu", "Menu", icon = Icons.Default.Menu),
+    MESSAGE(Routes.MESSAGE, isBottomEntry = false),
+    NEW_CONVERSATION(Routes.NEW_CONVERSATION, isBottomEntry = false),
+    USER(Routes.USER, isBottomEntry = false)
 }

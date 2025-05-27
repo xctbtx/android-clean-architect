@@ -12,4 +12,13 @@ object PostMapper {
             imageUrl = this.image_url,
         )
     }
+
+    fun Post.toDto(): PostDto {
+        return PostDto(
+            id = this.id!!,
+            title = this.title!!,
+            content = this.content!!,
+            image_url = this.imageUrl!!,
+        )
+    }
 }

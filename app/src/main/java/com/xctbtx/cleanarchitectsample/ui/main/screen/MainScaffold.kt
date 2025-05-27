@@ -17,16 +17,10 @@ import androidx.navigation.compose.rememberNavController
 import com.xctbtx.cleanarchitectsample.ui.navigation.AppNavGraph
 import com.xctbtx.cleanarchitectsample.ui.navigation.Destination
 
-
-@Composable
-fun HomeScreen(){
-    Text("Main screen")
-}
-
 @Composable
 fun MainScaffold(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
-    val startDestination = Destination.HOME
+    val startDestination = Destination.POSTS
     var selectedDestination by rememberSaveable { mutableIntStateOf(startDestination.ordinal) }
     Scaffold(
         modifier = modifier,

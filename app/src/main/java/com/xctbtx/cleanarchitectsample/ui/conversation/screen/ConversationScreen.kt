@@ -1,5 +1,7 @@
 package com.xctbtx.cleanarchitectsample.ui.conversation.screen
 
+import android.util.Log
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.Navigator
 import com.xctbtx.cleanarchitectsample.domain.conversation.model.Conversation
 import com.xctbtx.cleanarchitectsample.ui.conversation.viewmodel.ConversationViewModel
 import com.xctbtx.cleanarchitectsample.ui.navigation.Routes
@@ -39,6 +42,14 @@ fun ConversationScreen(
     Scaffold(
         topBar = {
             TopAppBar(title = { Text("Conversations") })
+        }, floatingActionButton = {
+            if (!state.isLoading && state.error == null) {
+                FloatingActionButton(
+                    onClick = { navController.navigate(Routes.NEW_CONVERSATION) }
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Add")
+                }
+            }
         }
     ) { padding ->
         when {
@@ -60,17 +71,15 @@ fun ConversationScreen(
                 }
             }
 
-            else -> ConversationList(
-                navController = navController,
-                conversations = state.conversations,
-                modifier = Modifier.padding(padding)
-            )
+            else -> {
+                ConversationList(
+                    navController = navController,
+                    conversations = state.conversations,
+                    modifier = Modifier.padding(padding)
+                )
+            }
         }
-        FloatingActionButton(
-            onClick = { navController.navigate(Routes.NEW_CONVERSATION) },
-        ) {
-            Icon(Icons.Filled.Add, "Floating action button.")
-        }
+
     }
 }
 
@@ -94,7 +103,11 @@ fun ConversationItem(navController: NavHostController, conversation: Conversatio
         modifier = Modifier
             .padding(16.dp)
             .clickable {
-                navController.navigate(Routes.MESSAGE, )
+                navController.currentBackStackEntry?.savedStateHandle?.set(
+                    "conversation",
+                    conversation
+                )
+                navController.navigate(Routes.MESSAGE)
             }) {
         //display conversation
         //conversation.icon

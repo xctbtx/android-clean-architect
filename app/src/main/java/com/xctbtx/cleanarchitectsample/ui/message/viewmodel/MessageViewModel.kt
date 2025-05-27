@@ -6,8 +6,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.xctbtx.cleanarchitectsample.data.ApiCallBack
+import com.xctbtx.cleanarchitectsample.data.message.dto.MessageDto
 import com.xctbtx.cleanarchitectsample.data.message.mapper.MessageMapper
+import com.xctbtx.cleanarchitectsample.domain.message.model.Message
 import com.xctbtx.cleanarchitectsample.domain.message.usecase.GetMessageUseCase
+import com.xctbtx.cleanarchitectsample.domain.message.usecase.SendMessageUseCase
 import com.xctbtx.cleanarchitectsample.domain.message.usecase.SyncMessageUseCase
 import com.xctbtx.cleanarchitectsample.domain.user.usecase.GetUserAvatarUseCase
 import com.xctbtx.cleanarchitectsample.ui.conversation.viewmodel.ConversationViewModel.Companion.TAG
@@ -17,13 +21,18 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.log
 
 @HiltViewModel
 class MessageViewModel @Inject constructor(
     private val getMessageUseCase: GetMessageUseCase,
     private val syncMessageUseCase: SyncMessageUseCase,
-    private val getUserAvatar: GetUserAvatarUseCase
+    private val getUserAvatar: GetUserAvatarUseCase,
+    private val sendMessageUseCase: SendMessageUseCase,
 ) : ViewModel() {
+    //todo Need login function for this to be real
+    private val currentUser = "user1"
+
     var messageContent by mutableStateOf("")
         private set
 
@@ -37,6 +46,7 @@ class MessageViewModel @Inject constructor(
         private set
 
     fun loadMessages(conversationId: String, participants: List<String>) {
+        Log.d(TAG, "loadMessages: $conversationId")
         viewModelScope.launch {
             uiState = uiState.copy(isLoading = true)
             try {
@@ -68,6 +78,19 @@ class MessageViewModel @Inject constructor(
 
     fun sendMessage() {
         //send message
+        sendMessageUseCase(
+            Message(content = messageContent, senderId = currentUser),
+            apiCallBack = object : ApiCallBack {
+                override fun onSuccess() {
+                    Log.d(TAG, "sendMessage onSuccess")
+                }
+
+                override fun onFailure(error: String) {
+                    Log.d(TAG, "sendMessage onFailure: $error")
+                }
+
+            }
+        )
         messageContent = ""
     }
 }
