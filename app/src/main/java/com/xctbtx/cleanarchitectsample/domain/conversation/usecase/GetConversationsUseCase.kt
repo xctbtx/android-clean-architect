@@ -4,10 +4,10 @@ import com.xctbtx.cleanarchitectsample.domain.conversation.model.Conversation
 import com.xctbtx.cleanarchitectsample.domain.conversation.repository.ConversationRepository
 import javax.inject.Inject
 
-class GetConversationUseCase @Inject constructor(
+class GetConversationsUseCase @Inject constructor(
     private val repository: ConversationRepository
 ) {
-    suspend operator fun invoke(id: String): Conversation {
-        return repository.getConversation(id)
+    suspend operator fun invoke(): List<Conversation> {
+        return repository.getConversations()
     }
 }

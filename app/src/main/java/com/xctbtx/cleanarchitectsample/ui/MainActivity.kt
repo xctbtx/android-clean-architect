@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.xctbtx.cleanarchitectsample.data.api.FireStoreApiService
 import com.xctbtx.cleanarchitectsample.ui.main.screen.MainScaffold
+import com.xctbtx.cleanarchitectsample.ui.theme.CleanArchitectTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -18,7 +19,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MainScaffold()
+            CleanArchitectTheme {
+                MainScaffold()
+            }
         }
     }
 

@@ -1,7 +1,6 @@
 package com.xctbtx.cleanarchitectsample.ui.conversation.screen
 
 import android.util.Log
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,18 +25,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
-import androidx.navigation.Navigator
 import com.xctbtx.cleanarchitectsample.domain.conversation.model.Conversation
 import com.xctbtx.cleanarchitectsample.ui.conversation.viewmodel.ConversationViewModel
-import com.xctbtx.cleanarchitectsample.ui.navigation.Routes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConversationScreen(
-    navController: NavHostController,
-    viewModel: ConversationViewModel = hiltViewModel()
+    navigateToMessage: (conversationId: String) -> Unit,
+    navigateToNewConversation: () -> Unit,
 ) {
+    val viewModel: ConversationViewModel = hiltViewModel()
     val state = viewModel.uiState
     Scaffold(
         topBar = {
@@ -45,7 +42,7 @@ fun ConversationScreen(
         }, floatingActionButton = {
             if (!state.isLoading && state.error == null) {
                 FloatingActionButton(
-                    onClick = { navController.navigate(Routes.NEW_CONVERSATION) }
+                    onClick = { navigateToNewConversation() }
                 ) {
                     Icon(Icons.Default.Add, contentDescription = "Add")
                 }
@@ -73,7 +70,7 @@ fun ConversationScreen(
 
             else -> {
                 ConversationList(
-                    navController = navController,
+                    navigateToMessage,
                     conversations = state.conversations,
                     modifier = Modifier.padding(padding)
                 )
@@ -85,29 +82,26 @@ fun ConversationScreen(
 
 @Composable
 fun ConversationList(
-    navController: NavHostController,
+    navigateToMessage: (String) -> Unit,
     conversations: List<Conversation>,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(modifier = modifier.fillMaxSize()) {
         items(conversations) { conversation ->
-            ConversationItem(navController, conversation)
+            ConversationItem(navigateToMessage, conversation)
             HorizontalDivider()
         }
     }
 }
 
 @Composable
-fun ConversationItem(navController: NavHostController, conversation: Conversation) {
+fun ConversationItem(navigateToMessage: (String) -> Unit, conversation: Conversation) {
     Column(
         modifier = Modifier
             .padding(16.dp)
             .clickable {
-                navController.currentBackStackEntry?.savedStateHandle?.set(
-                    "conversation",
-                    conversation
-                )
-                navController.navigate(Routes.MESSAGE)
+                Log.d("TAG", "ConversationItem: $conversation")
+                navigateToMessage(conversation.id)
             }) {
         //display conversation
         //conversation.icon

@@ -1,4 +1,6 @@
 package com.xctbtx.cleanarchitectsample.ui.user.viewmodel
 
-class viewmodel {
+import androidx.lifecycle.ViewModel
+
+class UserViewModel : ViewModel() {
 }

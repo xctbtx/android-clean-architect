@@ -1,5 +1,6 @@
 package com.xctbtx.cleanarchitectsample.data.message.mapper
 
+import com.google.firebase.Timestamp
 import com.xctbtx.cleanarchitectsample.data.message.dto.MessageDto
 import com.xctbtx.cleanarchitectsample.domain.message.model.Message
 import com.xctbtx.cleanarchitectsample.ui.message.model.MessageUiModel
@@ -9,8 +10,9 @@ object MessageMapper {
         return Message(
             id = this.id,
             content = this.content,
-            timestamp = this.timestamp,
-            senderId = this.senderId
+            createdAt = this.createdAt,
+            senderId = this.senderId,
+            conversationId = this.conversationId
         )
     }
 
@@ -18,14 +20,17 @@ object MessageMapper {
         return MessageDto(
             id = this["id"] as String,
             content = this["content"] as String,
-            timestamp = this["timestamp"] as Long,
-            senderId = this["senderId"] as String
+            createdAt = this["createdAt"] as Timestamp,
+            senderId = this["senderId"] as String,
+            conversationId = this["conversationId"] as String
         )
     }
 
     fun Message.toDto(): MessageDto {
         return MessageDto(
-
+            content = this.content,
+            conversationId = this.conversationId,
+            senderId = this.senderId,
         )
     }
 
@@ -35,10 +40,11 @@ object MessageMapper {
     ): List<MessageUiModel> {
         return messages.map {
             MessageUiModel(
-                id = it.id,
+                id = it.id ?: "Error",
                 image = avatarMap[it.senderId] ?: "",
+                senderId = it.senderId,
                 content = it.content,
-                timestamp = it.timestamp
+                createdAt = it.toString(),
             )
         }
     }

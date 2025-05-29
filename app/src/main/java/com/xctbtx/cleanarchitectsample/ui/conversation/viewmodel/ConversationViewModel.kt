@@ -7,7 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.xctbtx.cleanarchitectsample.domain.conversation.model.Conversation
-import com.xctbtx.cleanarchitectsample.domain.conversation.usecase.GetConversationUseCase
+import com.xctbtx.cleanarchitectsample.domain.conversation.usecase.GetConversationsUseCase
 import com.xctbtx.cleanarchitectsample.domain.conversation.usecase.SyncConversationUseCase
 import com.xctbtx.cleanarchitectsample.ui.conversation.state.ConversationUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ConversationViewModel @Inject constructor(
-    private val getConversationUseCase: GetConversationUseCase,
+    private val getConversationsUseCase: GetConversationsUseCase,
     private val syncConversationUseCase: SyncConversationUseCase
 ) : ViewModel() {
 
@@ -36,7 +36,7 @@ class ConversationViewModel @Inject constructor(
         viewModelScope.launch {
             uiState = uiState.copy(isLoading = true)
             try {
-                val conversations = getConversationUseCase()
+                val conversations = getConversationsUseCase()
                 Log.d(TAG, "loadConversations: $conversations")
                 uiState =
                     uiState.copy(conversations = conversations, isLoading = false, error = null)

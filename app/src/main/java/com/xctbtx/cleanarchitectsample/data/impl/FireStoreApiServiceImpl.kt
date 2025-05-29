@@ -3,6 +3,7 @@ package com.xctbtx.cleanarchitectsample.data.impl
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.toObject
 import com.xctbtx.cleanarchitectsample.data.ApiCallBack
 import com.xctbtx.cleanarchitectsample.data.Constants
 import com.xctbtx.cleanarchitectsample.data.api.FireStoreApiService
@@ -21,8 +22,18 @@ class FireStoreApiServiceImpl @Inject constructor(val api: FirebaseFirestore) :
         val response = api.collection(Constants.CONVERSATION_PATH)
             .get()
             .await()
-        Log.d(TAG, "getConversations: ${response.size()}")
-        return response.toObjects(ConversationDto::class.java)
+        return response.map {
+            it.toObject(ConversationDto::class.java).copy(id = it.id)
+        }
+    }
+
+    override suspend fun getConversation(id: String): ConversationDto {
+        val response = api.collection(Constants.CONVERSATION_PATH)
+            .document(id)
+            .get()
+            .await()
+        return response.toObject(ConversationDto::class.java)?.copy(id = response.id)
+            ?: ConversationDto()
     }
 
     override fun syncConversations(onConversationChanged: (List<ConversationDto>) -> Unit) {
@@ -33,7 +44,9 @@ class FireStoreApiServiceImpl @Inject constructor(val api: FirebaseFirestore) :
                     return@addSnapshotListener
                 }
                 if (snapshot != null) {
-                    onConversationChanged(snapshot.toObjects(ConversationDto::class.java))
+                    onConversationChanged(snapshot.map {
+                        it.toObject(ConversationDto::class.java).copy(id = it.id)
+                    })
                 } else {
                     Log.d(TAG, "syncConversations: null")
                 }
@@ -54,7 +67,11 @@ class FireStoreApiServiceImpl @Inject constructor(val api: FirebaseFirestore) :
                     return@addSnapshotListener
                 }
                 if (snapshot != null) {
-                    onMessageChanged(snapshot.toObjects(MessageDto::class.java))
+                    onMessageChanged(snapshot.map {
+                        it.toObject(MessageDto::class.java).copy(
+                            id = it.id
+                        )
+                    })
                 } else {
                     Log.d(TAG, "syncMessages: null")
                 }

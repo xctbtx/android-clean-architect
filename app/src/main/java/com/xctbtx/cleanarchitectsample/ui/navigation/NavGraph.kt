@@ -9,23 +9,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.xctbtx.cleanarchitectsample.ui.conversation.screen.ConversationScreen
 import com.xctbtx.cleanarchitectsample.ui.conversation.screen.NewConversationScreen
 import com.xctbtx.cleanarchitectsample.ui.menu.screen.MenuScreen
 import com.xctbtx.cleanarchitectsample.ui.message.screen.MessageScreen
+import com.xctbtx.cleanarchitectsample.ui.navigation.NavHelper.navigateSingleTopTo
+import com.xctbtx.cleanarchitectsample.ui.navigation.NavHelper.navigateToSingleConversation
 import com.xctbtx.cleanarchitectsample.ui.post.screen.PostScreen
 import com.xctbtx.cleanarchitectsample.ui.user.screen.UsersScreen
-
-object Routes {
-    const val POST = "posts"
-    const val CONVERSATION = "conversation"
-    const val NEW_CONVERSATION = "new_conversation"
-    const val MESSAGE = "message"
-    const val MENU = "message"
-    const val USER = "message"
-}
 
 @Composable
 fun AppNavGraph(
@@ -38,32 +33,82 @@ fun AppNavGraph(
         startDestination = startDestination.route,
         modifier = modifier
     ) {
-        Destination.entries.forEach { destination ->
-            composable(destination.route) {
-                when (destination) {
-                    Destination.CONVERSATION -> ConversationScreen(navController)
-                    Destination.NEW_CONVERSATION -> NewConversationScreen()
-                    Destination.MESSAGE -> MessageScreen()
-                    Destination.POSTS -> PostScreen()
-                    Destination.MENU -> MenuScreen()
-                    Destination.USER -> UsersScreen()
+        composable(route = Conversation.route) {
+            ConversationScreen(
+                navigateToMessage = { conversationId ->
+                    navController.navigateToSingleConversation(conversationId)
+                },
+                navigateToNewConversation = {
+                    navController.navigate(NewConversation.route)
                 }
-            }
+            )
+        }
+        composable(route = Menu.route) {
+            MenuScreen()
+        }
+        composable(route = NewConversation.route) {
+            NewConversationScreen()
+        }
+        composable(route = User.route) {
+            UsersScreen()
+        }
+        composable(route = Post.route) {
+            PostScreen()
+        }
+        composable(
+            route = Message.routeWithArgs,
+            arguments = Message.arguments
+        ) { navBackStackEntry ->
+            val conversationId = navBackStackEntry.arguments?.getString(Message.conversationIdArg)
+            MessageScreen(conversationId)
         }
     }
 }
 
-enum class Destination(
-    val route: String,
-    val label: String = "",
-    val contentDescription: String = "",
-    val isBottomEntry: Boolean = true,
-    val icon: ImageVector = Icons.Default.Home
-) {
-    CONVERSATION(Routes.CONVERSATION, "Chat", "Conversation", icon = Icons.Outlined.Email),
-    POSTS(Routes.POST, "Posts", "Posts", icon = Icons.Default.Person),
-    MENU(Routes.MENU, "Menu", "Menu", icon = Icons.Default.Menu),
-    MESSAGE(Routes.MESSAGE, isBottomEntry = false),
-    NEW_CONVERSATION(Routes.NEW_CONVERSATION, isBottomEntry = false),
-    USER(Routes.USER, isBottomEntry = false)
+interface Destination {
+    val route: String
+}
+
+interface BottomDestination : Destination {
+    val icon: ImageVector
+    val label: String
+    val contentDescription: String
+}
+
+object Conversation : BottomDestination {
+    override val route = "conversation"
+    override val label = "Chats"
+    override val contentDescription = "Chats"
+    override val icon = Icons.Outlined.Email
+}
+
+object Post : BottomDestination {
+    override val route = "post"
+    override val label = "Posts"
+    override val contentDescription = "Posts"
+    override val icon = Icons.Default.Person
+}
+
+object Menu : BottomDestination {
+    override val route = "menu"
+    override val label = "Menu"
+    override val contentDescription = "Menu"
+    override val icon = Icons.Default.Menu
+}
+
+object Message : Destination {
+    override val route = "message"
+    const val conversationIdArg = "conversation_id"
+    val routeWithArgs = "${route}/{${conversationIdArg}}"
+    val arguments = listOf(
+        navArgument(conversationIdArg) { type = NavType.StringType }
+    )
+}
+
+object NewConversation : Destination {
+    override val route = "new_conversation"
+}
+
+object User : Destination {
+    override val route = "user"
 }

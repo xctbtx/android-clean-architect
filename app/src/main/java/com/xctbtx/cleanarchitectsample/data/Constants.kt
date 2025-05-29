@@ -14,5 +14,5 @@ object Constants {
     const val CONVERSATION_PATH = "conversations"
     const val MESSAGE_PATH = "messages"
     const val USER_PATH = "users"
-    const val ORDER_BY_PARAM = "timestamp"
+    const val ORDER_BY_PARAM = "createdAt"
 }

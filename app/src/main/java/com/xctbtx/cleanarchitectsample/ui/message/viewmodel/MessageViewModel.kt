@@ -7,8 +7,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.xctbtx.cleanarchitectsample.data.ApiCallBack
-import com.xctbtx.cleanarchitectsample.data.message.dto.MessageDto
 import com.xctbtx.cleanarchitectsample.data.message.mapper.MessageMapper
+import com.xctbtx.cleanarchitectsample.domain.conversation.usecase.GetConversationUseCase
 import com.xctbtx.cleanarchitectsample.domain.message.model.Message
 import com.xctbtx.cleanarchitectsample.domain.message.usecase.GetMessageUseCase
 import com.xctbtx.cleanarchitectsample.domain.message.usecase.SendMessageUseCase
@@ -19,9 +19,9 @@ import com.xctbtx.cleanarchitectsample.ui.message.model.MessageUiModel
 import com.xctbtx.cleanarchitectsample.ui.message.state.MessageUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.math.log
 
 @HiltViewModel
 class MessageViewModel @Inject constructor(
@@ -29,9 +29,12 @@ class MessageViewModel @Inject constructor(
     private val syncMessageUseCase: SyncMessageUseCase,
     private val getUserAvatar: GetUserAvatarUseCase,
     private val sendMessageUseCase: SendMessageUseCase,
+    private val getConversationUseCase: GetConversationUseCase,
 ) : ViewModel() {
     //todo Need login function for this to be real
-    private val currentUser = "user1"
+    val currentUserId = "user1"
+
+    private var mConversationId: String = ""
 
     var messageContent by mutableStateOf("")
         private set
@@ -45,18 +48,24 @@ class MessageViewModel @Inject constructor(
     var uiState by mutableStateOf(MessageUiState())
         private set
 
-    fun loadMessages(conversationId: String, participants: List<String>) {
+    fun loadMessages(conversationId: String) {
         Log.d(TAG, "loadMessages: $conversationId")
         viewModelScope.launch {
             uiState = uiState.copy(isLoading = true)
             try {
                 val messages = getMessageUseCase(conversationId)
-                avatarMap = participants.associateWith { userId ->
-                    async { getUserAvatar(userId) }
-                }.mapValues { it.value.await() }
+                val participants = getConversationUseCase(conversationId).participants
+                val avatarDeferred = participants.map { userId ->
+                    async {
+                        val avatar = getUserAvatar(userId)
+                        userId to avatar
+                    }
+                }
+                avatarMap = avatarDeferred.awaitAll().toMap()
                 val result = MessageMapper.mapToUiModel(messages, avatarMap)
                 uiState = uiState.copy(messages = result, isLoading = false, error = null)
                 syncMessage(conversationId)
+                mConversationId = conversationId
             } catch (e: Exception) {
                 uiState = uiState.copy(error = e.message ?: "Unknown error", isLoading = false)
             }
@@ -79,7 +88,11 @@ class MessageViewModel @Inject constructor(
     fun sendMessage() {
         //send message
         sendMessageUseCase(
-            Message(content = messageContent, senderId = currentUser),
+            Message(
+                conversationId = mConversationId,
+                content = messageContent,
+                senderId = currentUserId
+            ),
             apiCallBack = object : ApiCallBack {
                 override fun onSuccess() {
                     Log.d(TAG, "sendMessage onSuccess")
