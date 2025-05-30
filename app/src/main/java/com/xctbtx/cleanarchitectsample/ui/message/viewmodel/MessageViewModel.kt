@@ -53,8 +53,11 @@ class MessageViewModel @Inject constructor(
         viewModelScope.launch {
             uiState = uiState.copy(isLoading = true)
             try {
+                val title: String
                 val messages = getMessageUseCase(conversationId)
-                val participants = getConversationUseCase(conversationId).participants
+                val participants = getConversationUseCase(conversationId).also {
+                    title = it.title
+                }.participants
                 val avatarDeferred = participants.map { userId ->
                     async {
                         val avatar = getUserAvatar(userId)
@@ -63,7 +66,8 @@ class MessageViewModel @Inject constructor(
                 }
                 avatarMap = avatarDeferred.awaitAll().toMap()
                 val result = MessageMapper.mapToUiModel(messages, avatarMap)
-                uiState = uiState.copy(messages = result, isLoading = false, error = null)
+                uiState =
+                    uiState.copy(title = title, messages = result, isLoading = false, error = null)
                 syncMessage(conversationId)
                 mConversationId = conversationId
             } catch (e: Exception) {

@@ -67,7 +67,7 @@ fun MessageScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Message",
+                        state.title,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
                     )
