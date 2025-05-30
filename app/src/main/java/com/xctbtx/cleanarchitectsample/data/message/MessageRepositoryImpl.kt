@@ -13,7 +13,7 @@ class MessageRepositoryImpl @Inject constructor(
 ) : MessageRepository {
 
     override suspend fun getMessages(conversationId: String): List<Message> {
-        val response = api.getMessages(conversationId)
+        val response = api.getMessagesForConversation(conversationId)
 
         return response.map {
             it.toDomain()

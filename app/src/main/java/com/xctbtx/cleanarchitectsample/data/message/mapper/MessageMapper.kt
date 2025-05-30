@@ -1,6 +1,6 @@
 package com.xctbtx.cleanarchitectsample.data.message.mapper
 
-import com.google.firebase.Timestamp
+import com.google.firebase.firestore.QuerySnapshot
 import com.xctbtx.cleanarchitectsample.data.message.dto.MessageDto
 import com.xctbtx.cleanarchitectsample.domain.message.model.Message
 import com.xctbtx.cleanarchitectsample.ui.message.model.MessageUiModel
@@ -16,14 +16,8 @@ object MessageMapper {
         )
     }
 
-    fun Map<String, Any>.toMessageDto(): MessageDto {
-        return MessageDto(
-            id = this["id"] as String,
-            content = this["content"] as String,
-            createdAt = this["createdAt"] as Timestamp,
-            senderId = this["senderId"] as String,
-            conversationId = this["conversationId"] as String
-        )
+    fun QuerySnapshot.toMessagesDto(): List<MessageDto> {
+        return this.map { it.toObject(MessageDto::class.java).copy(id = it.id) }
     }
 
     fun Message.toDto(): MessageDto {
