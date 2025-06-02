@@ -2,6 +2,7 @@ package com.xctbtx.cleanarchitectsample.ui.menu.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,12 +37,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-data class MenuItem(val title: String, val icon: ImageVector)
+data class MenuItem(val title: String, val icon: ImageVector, val onClick: () -> Unit = {})
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MenuScreen() {
     val menuItems = listOf(
+        MenuItem("Profile", Icons.Default.Face, onClick = {}),
         MenuItem("Settings", Icons.Default.Settings),
         MenuItem("Marketplace", Icons.Default.ShoppingCart),
         MenuItem("Message requests", Icons.Default.Warning),
@@ -61,7 +63,7 @@ fun MenuScreen() {
                 title = { Text("Messenger") },
                 modifier = Modifier.background(Color.Blue),
                 colors = TopAppBarDefaults.topAppBarColors().copy(
-                    titleContentColor = Color.White
+                    titleContentColor = Color.Black
                 )
             )
         }
@@ -83,8 +85,11 @@ fun MenuItemCard(item: MenuItem) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
+            .padding(8.dp)
+            .clickable { item.onClick.invoke() },
+        colors = CardDefaults.cardColors().copy(
+            containerColor = Color.Transparent,
+        )
     ) {
         Row(
             modifier = Modifier

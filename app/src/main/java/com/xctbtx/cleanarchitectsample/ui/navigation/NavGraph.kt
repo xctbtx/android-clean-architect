@@ -1,9 +1,15 @@
 package com.xctbtx.cleanarchitectsample.ui.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -15,6 +21,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.xctbtx.cleanarchitectsample.ui.conversation.screen.ConversationScreen
 import com.xctbtx.cleanarchitectsample.ui.conversation.screen.NewConversationScreen
+import com.xctbtx.cleanarchitectsample.ui.auth.screen.LoginScreen
+import com.xctbtx.cleanarchitectsample.ui.menu.screen.MenuItem
 import com.xctbtx.cleanarchitectsample.ui.menu.screen.MenuScreen
 import com.xctbtx.cleanarchitectsample.ui.message.screen.MessageScreen
 import com.xctbtx.cleanarchitectsample.ui.navigation.NavHelper.navigateSingleTopTo
@@ -62,12 +70,27 @@ fun AppNavGraph(
             val conversationId = navBackStackEntry.arguments?.getString(Message.conversationIdArg)
             MessageScreen(conversationId)
         }
+
+        composable(
+            route = Login.route
+        ) {
+            LoginScreen { userId ->
+                navController.navigateSingleTopTo(Post.route)
+            }
+        }
     }
 }
 
 interface Destination {
     val route: String
 }
+
+interface MenuItem : Destination {
+    val title: String
+    val icon: ImageVector
+    val onClick: () -> Unit
+}
+
 
 interface BottomDestination : Destination {
     val icon: ImageVector
@@ -111,4 +134,8 @@ object NewConversation : Destination {
 
 object User : Destination {
     override val route = "user"
+}
+
+object Login : Destination {
+    override val route = "login"
 }

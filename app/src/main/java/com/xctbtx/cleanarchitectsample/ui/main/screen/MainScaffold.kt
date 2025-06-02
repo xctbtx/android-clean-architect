@@ -9,19 +9,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import com.xctbtx.cleanarchitectsample.ui.conversation.screen.ConversationScreen
 import com.xctbtx.cleanarchitectsample.ui.navigation.AppNavGraph
-import com.xctbtx.cleanarchitectsample.ui.navigation.BottomDestination
 import com.xctbtx.cleanarchitectsample.ui.navigation.Conversation
-import com.xctbtx.cleanarchitectsample.ui.navigation.Destination
 import com.xctbtx.cleanarchitectsample.ui.navigation.Menu
-import com.xctbtx.cleanarchitectsample.ui.navigation.Message
 import com.xctbtx.cleanarchitectsample.ui.navigation.Post
 
 @Composable

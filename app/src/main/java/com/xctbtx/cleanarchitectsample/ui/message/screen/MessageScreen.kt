@@ -12,10 +12,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -128,13 +129,16 @@ fun MessageList(
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        items(messages) { message ->
+        itemsIndexed(messages) { index, message ->
             val isMyOwn = currentUserId == message.senderId
+            val topPadding =
+                if (message.senderId == messages.getOrNull(index - 1)?.senderId) 0.dp else 16.dp
             Box(
                 contentAlignment = if (isMyOwn) Alignment.CenterEnd else Alignment.CenterStart,
-                modifier = modifier.fillMaxSize()
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(top = topPadding)
             ) {
                 MessageItem(message, isMyOwn, modifier)
             }
@@ -179,7 +183,7 @@ fun MessageItem(message: MessageUiModel, isMyOwn: Boolean, modifier: Modifier) {
 @Composable
 fun ChatBox(modifier: Modifier) {
     val viewModel: MessageViewModel = hiltViewModel()
-    Row(modifier = modifier.padding(bottom = 10.dp)) {
+    Row(modifier = modifier.padding(4.dp)) {
         TextField(
             value = viewModel.messageContent,
             colors = TextFieldDefaults.colors().copy(
@@ -188,9 +192,9 @@ fun ChatBox(modifier: Modifier) {
                 focusedIndicatorColor = Color.Transparent,
                 disabledIndicatorColor = Color.Transparent
             ),
+            shape = RoundedCornerShape(16.dp),
             onValueChange = viewModel::onMessageChange,
             modifier = Modifier
-                .clip(RoundedCornerShape(16.dp))
                 .padding(4.dp)
                 .weight(8f),
         )
@@ -198,10 +202,10 @@ fun ChatBox(modifier: Modifier) {
             Icons.AutoMirrored.Filled.Send,
             null,
             Modifier
-                .padding(4.dp)
                 .clickable {
                     viewModel.sendMessage()
                 }
+                .size(40.dp)
                 .align(Alignment.CenterVertically)
         )
     }
