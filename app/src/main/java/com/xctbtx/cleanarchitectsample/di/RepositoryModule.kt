@@ -1,9 +1,11 @@
 package com.xctbtx.cleanarchitectsample.di
 
+import com.xctbtx.cleanarchitectsample.data.auth.AuthenticationRepositoryImpl
 import com.xctbtx.cleanarchitectsample.data.conversation.ConversationRepositoryImpl
 import com.xctbtx.cleanarchitectsample.data.message.MessageRepositoryImpl
 import com.xctbtx.cleanarchitectsample.data.post.PostRepositoryImpl
 import com.xctbtx.cleanarchitectsample.data.user.UserRepositoryImpl
+import com.xctbtx.cleanarchitectsample.domain.auth.repository.AuthenticationRepository
 import com.xctbtx.cleanarchitectsample.domain.conversation.repository.ConversationRepository
 import com.xctbtx.cleanarchitectsample.domain.message.repository.MessageRepository
 import com.xctbtx.cleanarchitectsample.domain.post.repository.PostRepository
@@ -35,4 +37,9 @@ abstract class RepositoryModule {
     abstract fun bindMessageRepository(
         impl: MessageRepositoryImpl
     ): MessageRepository
+
+    @Binds
+    abstract fun bindAuthRepository(
+        impl: AuthenticationRepositoryImpl
+    ): AuthenticationRepository
 }

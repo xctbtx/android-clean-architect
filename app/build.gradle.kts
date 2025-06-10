@@ -80,4 +80,6 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.messaging)
     implementation(libs.firebase.firestore)
+    //Data store
+    implementation(libs.androidx.datastore.preferences)
 }

@@ -14,13 +14,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import com.xctbtx.cleanarchitectsample.ui.main.viewmodel.MainViewModel
 import com.xctbtx.cleanarchitectsample.ui.navigation.AppNavGraph
 import com.xctbtx.cleanarchitectsample.ui.navigation.Conversation
 import com.xctbtx.cleanarchitectsample.ui.navigation.Menu
 import com.xctbtx.cleanarchitectsample.ui.navigation.Post
 
 @Composable
-fun MainScaffold(modifier: Modifier = Modifier) {
+fun MainScaffold(viewModel: MainViewModel, modifier: Modifier = Modifier) {
     val navController = rememberNavController()
     val destinations = listOf(Post, Conversation, Menu)
     val startDestination = destinations[0]
@@ -48,6 +49,6 @@ fun MainScaffold(modifier: Modifier = Modifier) {
             }
         }
     ) { contentPadding ->
-        AppNavGraph(navController, startDestination, modifier = Modifier.padding(contentPadding))
+        AppNavGraph(viewModel, navController, startDestination, modifier = Modifier.padding(contentPadding))
     }
 }

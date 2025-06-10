@@ -1,8 +1,11 @@
 package com.xctbtx.cleanarchitectsample.data.impl
 
 import android.util.Log
+import com.google.android.gms.common.api.Api
+import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.MetadataChanges
 import com.xctbtx.cleanarchitectsample.data.ApiCallBack
 import com.xctbtx.cleanarchitectsample.data.Constants
 import com.xctbtx.cleanarchitectsample.data.api.FireStoreApiService
@@ -12,6 +15,11 @@ import com.xctbtx.cleanarchitectsample.data.conversation.mapper.ConversationMapp
 import com.xctbtx.cleanarchitectsample.data.message.dto.MessageDto
 import com.xctbtx.cleanarchitectsample.data.message.mapper.MessageMapper.toMessagesDto
 import com.xctbtx.cleanarchitectsample.data.user.dto.UserDto
+import com.xctbtx.cleanarchitectsample.data.user.mapper.UserMapper.toUserDto
+import com.xctbtx.cleanarchitectsample.data.user.mapper.UserMapper.toUsersDto
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -30,7 +38,7 @@ class FireStoreApiServiceImpl @Inject constructor(val api: FirebaseFirestore) :
 
     override fun syncConversations(onConversationChanged: (List<ConversationDto>) -> Unit) {
         val registration = api.collection(Constants.CONVERSATION_PATH)
-            .addSnapshotListener { snapshot, e ->
+            .addSnapshotListener(MetadataChanges.INCLUDE) { snapshot, e ->
                 if (e != null) {
                     Log.d(TAG, "syncConversations: failed", e)
                     return@addSnapshotListener
@@ -39,6 +47,17 @@ class FireStoreApiServiceImpl @Inject constructor(val api: FirebaseFirestore) :
                     onConversationChanged(snapshot.toConversationsDto())
                 } else {
                     Log.d(TAG, "syncConversations: null")
+                }
+                for (change in snapshot!!.documentChanges) {
+                    if (change.type == DocumentChange.Type.ADDED) {
+                        Log.d(TAG, "New Conversation: ${change.document.data}")
+                    }
+                    val source = if (snapshot.metadata.isFromCache) {
+                        "local cache"
+                    } else {
+                        "server"
+                    }
+                    Log.d(TAG, "Data fetched from $source")
                 }
             }
         registrations.add(registration)
@@ -79,20 +98,31 @@ class FireStoreApiServiceImpl @Inject constructor(val api: FirebaseFirestore) :
         val response = api.collection(Constants.USER_PATH).document(id).get()
             .await()
         Log.d(TAG, "getUser: $response")
-        return response.toObject(UserDto::class.java) ?: UserDto()
+        return response.toUserDto()
     }
 
-    override fun addUser(payload: UserDto, callBack: ApiCallBack) {
-        api.collection(Constants.USER_PATH).add(payload)
-            .addOnCompleteListener {
+
+    override suspend fun login(username: String, password: String): UserDto? {
+        val response = api.collection(Constants.USER_PATH)
+            .whereEqualTo("userName", username)
+            .whereEqualTo("password", password)
+            .limit(1)
+            .get().await()
+        return response.toUsersDto()?.first()
+    }
+
+    override suspend fun signIn(payload: UserDto, password: String, callBack: ApiCallBack) {
+        val result = api.collection(Constants.USER_PATH).add(payload)
+        api.collection(Constants.USER_PATH).document(result.await().id)
+            .update("password", password).addOnCompleteListener {
                 callBack.onSuccess()
-                Log.d(TAG, "addUser: Success.")
+                Log.d(TAG, "signIn: Success.")
             }
             .addOnFailureListener { e ->
                 callBack.onFailure(
                     e.message ?: "Unknown error"
                 )
-                Log.d(TAG, "addUser: Failed")
+                Log.d(TAG, "signIn: Failed")
             }
     }
 

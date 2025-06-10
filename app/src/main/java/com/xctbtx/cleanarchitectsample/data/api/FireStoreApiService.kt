@@ -13,7 +13,8 @@ interface FireStoreApiService {
     suspend fun getMessagesForConversation(conversationId: String): List<MessageDto>
     fun syncMessages(conversationId: String, onMessageChanged: (List<MessageDto>) -> Unit)
     suspend fun getUser(id: String): UserDto
-    fun addUser(payload: UserDto, callBack: ApiCallBack)
+    suspend fun login(username: String, password: String): UserDto?
+    suspend fun signIn(payload: UserDto, password: String, callBack: ApiCallBack)
     fun sendMessage(payload: MessageDto, callBack: ApiCallBack)
     fun addConversation(payload: ConversationDto, callBack: ApiCallBack)
 }

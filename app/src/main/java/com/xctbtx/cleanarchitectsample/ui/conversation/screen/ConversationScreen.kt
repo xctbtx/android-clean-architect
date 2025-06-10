@@ -1,5 +1,8 @@
 package com.xctbtx.cleanarchitectsample.ui.conversation.screen
 
+import android.content.Context
+import android.net.Uri
+import android.telecom.TelecomManager
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -33,17 +36,19 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.xctbtx.cleanarchitectsample.R
 import com.xctbtx.cleanarchitectsample.domain.conversation.model.Conversation
 import com.xctbtx.cleanarchitectsample.ui.conversation.viewmodel.ConversationViewModel
+import androidx.core.net.toUri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConversationScreen(
     navigateToMessage: (conversationId: String) -> Unit,
-    navigateToNewConversation: () -> Unit,
+    navigateToNewConversation: (String) -> Unit,
 ) {
     val viewModel: ConversationViewModel = hiltViewModel()
     val state = viewModel.uiState
@@ -53,7 +58,8 @@ fun ConversationScreen(
         }, floatingActionButton = {
             if (!state.isLoading && state.error == null) {
                 FloatingActionButton(
-                    onClick = { navigateToNewConversation() }
+                    onClick = { navigateToNewConversation.invoke("tel:0123456789")
+                    }
                 ) {
                     Icon(Icons.Default.Add, contentDescription = "Add")
                 }
@@ -64,7 +70,7 @@ fun ConversationScreen(
             state.isLoading -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
-                    contentAlignment = androidx.compose.ui.Alignment.Center
+                    contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()
                 }
@@ -73,7 +79,7 @@ fun ConversationScreen(
             state.error != null -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
-                    contentAlignment = androidx.compose.ui.Alignment.Center
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(text = state.error)
                 }

@@ -10,7 +10,6 @@ object Constants {
     const val PHOTO_ENDPOINT = "/photos"
     const val USER_ENDPOINT = "/users"
 
-    const val BASE_FIRESTORE_URL = "https://jsonplaceholder.typicode.com"
     const val CONVERSATION_PATH = "conversations"
     const val MESSAGE_PATH = "messages"
     const val USER_PATH = "users"

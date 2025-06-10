@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Info
@@ -41,11 +42,11 @@ data class MenuItem(val title: String, val icon: ImageVector, val onClick: () ->
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MenuScreen() {
+fun MenuScreen(toDialerScreen: () -> Unit = {}, toProfileScreen: () -> Unit = {}) {
     val menuItems = listOf(
-        MenuItem("Profile", Icons.Default.Face, onClick = {}),
+        MenuItem("Profile", Icons.Default.Face, onClick = toProfileScreen),
         MenuItem("Settings", Icons.Default.Settings),
-        MenuItem("Marketplace", Icons.Default.ShoppingCart),
+        MenuItem("Dialer", Icons.Default.Call, onClick = toDialerScreen),
         MenuItem("Message requests", Icons.Default.Warning),
         MenuItem("Archive", Icons.Default.Delete),
         //more
