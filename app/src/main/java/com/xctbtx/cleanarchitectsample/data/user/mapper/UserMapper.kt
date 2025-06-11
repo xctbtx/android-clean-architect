@@ -4,6 +4,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
 import com.xctbtx.cleanarchitectsample.data.user.dto.UserDto
 import com.xctbtx.cleanarchitectsample.domain.user.model.User
+import com.xctbtx.cleanarchitectsample.ui.auth.model.UserUiModel
 
 object UserMapper {
     fun UserDto.toDomain(): User {
@@ -21,5 +22,15 @@ object UserMapper {
 
     fun DocumentSnapshot.toUserDto(): UserDto {
         return this.toObject(UserDto::class.java)?.copy(id = id) ?: UserDto()
+    }
+
+    fun UserUiModel.toDto(): UserDto {
+        return UserDto(
+            name = name,
+            username = username,
+            address = address,
+            dob = dob,
+            avatar = avatar.toString()
+        )
     }
 }

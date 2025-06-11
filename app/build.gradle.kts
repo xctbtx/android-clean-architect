@@ -80,6 +80,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.messaging)
     implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage.ktx)
     //Data store
     implementation(libs.androidx.datastore.preferences)
 }

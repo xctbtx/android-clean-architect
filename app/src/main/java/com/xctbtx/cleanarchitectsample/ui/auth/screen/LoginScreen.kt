@@ -13,15 +13,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
@@ -85,33 +83,23 @@ fun LoginContainer(
             .fillMaxSize(),
         verticalArrangement = Arrangement.Center
     ) {
-        TextField(
-            value = viewModel.username,
+        OutlinedTextField(
+            value = viewModel.uiState.user.username,
             label = { Text("User name") },
             onValueChange = viewModel::onUsernameChange,
-            colors = TextFieldDefaults.colors().copy(
-                errorContainerColor = Color.Red,
-                unfocusedIndicatorColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent
-            ),
             shape = RoundedCornerShape(16.dp),
+            singleLine = true,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(12.dp)
         )
-        TextField(
-            value = viewModel.password,
+        OutlinedTextField(
+            value = viewModel.uiState.user.password,
             label = { Text("Password") },
             onValueChange = viewModel::onPasswordChange,
-            colors = TextFieldDefaults.colors().copy(
-                errorContainerColor = Color.Red,
-                unfocusedIndicatorColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent
-            ),
             visualTransformation = PasswordVisualTransformation(),
             shape = RoundedCornerShape(16.dp),
+            singleLine = true,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(12.dp)
@@ -130,9 +118,11 @@ fun LoginContainer(
                     append("Register")
                 }
             },
-            modifier = Modifier.clickable {
-                onRegisterClick()
-            })
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .clickable {
+                    onRegisterClick()
+                })
         Button(
             onClick = {
                 viewModel.performLogin(object : ApiCallBack {

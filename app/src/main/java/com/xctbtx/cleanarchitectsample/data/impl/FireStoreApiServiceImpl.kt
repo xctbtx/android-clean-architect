@@ -104,7 +104,7 @@ class FireStoreApiServiceImpl @Inject constructor(val api: FirebaseFirestore) :
 
     override suspend fun login(username: String, password: String): UserDto? {
         val response = api.collection(Constants.USER_PATH)
-            .whereEqualTo("userName", username)
+            .whereEqualTo("username", username)
             .whereEqualTo("password", password)
             .limit(1)
             .get().await()
