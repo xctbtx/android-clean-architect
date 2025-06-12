@@ -6,16 +6,17 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.telecom.TelecomManager
 import android.util.Log
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback
 import androidx.core.net.toUri
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.xctbtx.cleanarchitectsample.data.BiometricLoginManager
 import com.xctbtx.cleanarchitectsample.data.api.FireStoreApiService
 import com.xctbtx.cleanarchitectsample.ui.main.screen.MainScaffold
 import com.xctbtx.cleanarchitectsample.ui.main.viewmodel.MainViewModel
@@ -25,10 +26,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity(), OnRequestPermissionsResultCallback {
+class MainActivity : FragmentActivity(), OnRequestPermissionsResultCallback {
 
     @Inject
     lateinit var firestore: FireStoreApiService
+
+    @Inject
+    lateinit var biometric: BiometricLoginManager
 
     private val viewModel: MainViewModel by viewModels()
 
@@ -53,11 +57,34 @@ class MainActivity : ComponentActivity(), OnRequestPermissionsResultCallback {
                             performCall(event.phoneNumber)
                         }
 
+                        is MainViewModel.UiEvent.SaveUserId -> {
+                            saveUserIdWithBiometric(event.userId, event.onSuccess, event.onError)
+                        }
+
+                        is MainViewModel.UiEvent.LoginWithBiometric -> {
+                            loginWithBiometric(event.onResult, event.onError)
+                        }
+
                         else -> Log.d("TAG", "Un-handle case")
                     }
                 }
             }
         }
+    }
+
+    private fun loginWithBiometric(
+        onResult: (String?) -> Unit,
+        onError: (Throwable) -> Unit
+    ) {
+        biometric.tryLogin(this, onResult, onError)
+    }
+
+    private fun saveUserIdWithBiometric(
+        userId: String,
+        onSuccess: () -> Unit,
+        onError: (Throwable) -> Unit
+    ) {
+        biometric.saveUserId(this, userId, onSuccess, onError)
     }
 
     private fun performCall(number: String) {
@@ -91,7 +118,7 @@ class MainActivity : ComponentActivity(), OnRequestPermissionsResultCallback {
             "TAG",
             "onRequestPermissionsResult: ${grantResults[0] == PackageManager.PERMISSION_GRANTED}"
         )
-        if (grantResults[0] == PackageManager.PERMISSION_GRANTED && requestCode == 11) {
+        if (grantResults[0] == PackageManager.PERMISSION_GRANTED && requestCode == 112) {
             performCall(requestCode.toString())
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults, deviceId)

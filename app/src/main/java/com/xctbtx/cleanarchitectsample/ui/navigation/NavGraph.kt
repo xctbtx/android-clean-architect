@@ -77,7 +77,7 @@ fun AppNavGraph(
         composable(
             route = Login.route
         ) {
-            LoginScreen(onLoginSuccess = { _ ->
+            LoginScreen(viewModel, onLoginSuccess = { _ ->
                 navController.navigateSingleTopTo(Post.route)
             }, onRegisterClick = {
                 navController.navigateSingleTopTo(Register.route)
@@ -87,7 +87,7 @@ fun AppNavGraph(
         composable(
             route = Register.route
         ) {
-            RegisterScreen {
+            RegisterScreen(viewModel) {
                 navController.navigateSingleTopTo(Login.route)
             }
         }

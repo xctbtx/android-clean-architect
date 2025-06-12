@@ -83,4 +83,6 @@ dependencies {
     implementation(libs.firebase.storage.ktx)
     //Data store
     implementation(libs.androidx.datastore.preferences)
+    //Biometric
+    implementation(libs.androidx.biometric)
 }

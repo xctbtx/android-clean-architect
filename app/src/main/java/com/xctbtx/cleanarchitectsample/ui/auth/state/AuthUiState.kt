@@ -5,6 +5,7 @@ import com.xctbtx.cleanarchitectsample.ui.auth.model.UserUiModel
 data class AuthUiState(
     val isSuccess: Boolean = false,
     val isLoading: Boolean = false,
+    val isValidate: Boolean = false,
     val error: String? = null,
     val user: UserUiModel = UserUiModel()
 )

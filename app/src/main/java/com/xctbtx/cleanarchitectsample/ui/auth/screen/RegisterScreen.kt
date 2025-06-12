@@ -2,6 +2,7 @@ package com.xctbtx.cleanarchitectsample.ui.auth.screen
 
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -37,6 +39,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -49,23 +52,27 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.xctbtx.cleanarchitectsample.data.ApiCallBack
 import com.xctbtx.cleanarchitectsample.ui.auth.viewmodel.AuthViewModel
+import com.xctbtx.cleanarchitectsample.ui.main.viewmodel.MainViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterScreen(onRegisterSuccess: () -> Unit) {
+fun RegisterScreen(mVM: MainViewModel, onRegisterSuccess: () -> Unit) {
     val viewModel: AuthViewModel = hiltViewModel()
     val state = viewModel.uiState
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Login") })
+            TopAppBar(title = { Text("Register") })
         }
     ) { padding ->
         when {
@@ -96,11 +103,10 @@ fun RegisterScreen(onRegisterSuccess: () -> Unit) {
 
 @Composable
 fun DatePickerFieldToModal(viewModel: AuthViewModel, modifier: Modifier = Modifier) {
-    var selectedDate by remember { mutableStateOf(viewModel.uiState.user.dob) }
     var showModal by remember { mutableStateOf(false) }
 
     OutlinedTextField(
-        value = selectedDate ?: "",
+        value = viewModel.uiState.user.dob ?: "",
         onValueChange = { viewModel.onDobChange(it) },
         label = { Text("DOB") },
         shape = RoundedCornerShape(16.dp),
@@ -111,7 +117,7 @@ fun DatePickerFieldToModal(viewModel: AuthViewModel, modifier: Modifier = Modifi
         modifier = modifier
             .fillMaxWidth()
             .padding(12.dp)
-            .pointerInput(selectedDate) {
+            .pointerInput(Any()) {
                 awaitEachGesture {
                     // Modifier.clickable doesn't work for text fields, so we use Modifier.pointerInput
                     // in the Initial pass to observe events before the text field consumes them
@@ -127,7 +133,9 @@ fun DatePickerFieldToModal(viewModel: AuthViewModel, modifier: Modifier = Modifi
 
     if (showModal) {
         DatePickerModal(
-            onDateSelected = { selectedDate = convertMillisToDate(it ?: 0) },
+            onDateSelected = {
+                viewModel.onDobChange(convertMillisToDate(it ?: 0))
+            },
             onDismiss = { showModal = false }
         )
     }
@@ -172,11 +180,23 @@ fun RegisterContainer(
     onRegisterSuccess: () -> Unit
 ) {
     val viewModel: AuthViewModel = hiltViewModel()
+    var step by remember { mutableIntStateOf(0) }
     Column(
         modifier = Modifier
             .padding(paddingValues)
             .fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        when (step) {
+            0 -> BasicInfoContainer(viewModel) { step = 1 }
+            else -> AccountInfoContainer(viewModel, { step = 0 }, onRegisterSuccess)
+        }
+    }
+}
+
+@Composable
+fun BasicInfoContainer(viewModel: AuthViewModel, nextStep: () -> Unit) {
+    Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         AvatarPicker(viewModel)
@@ -193,21 +213,75 @@ fun RegisterContainer(
         DatePickerFieldToModal(viewModel)
         Button(
             onClick = {
-                viewModel.performRegister(object : ApiCallBack {
-                    override fun onSuccess() {
-                        onRegisterSuccess()
-                    }
-
-                    override fun onFailure(error: String) {
-                        Log.d(TAG, "onFailure: $error")
-                    }
-
-                })
+                nextStep()
             }, modifier = Modifier
                 .padding(top = 50.dp)
         ) {
-            Text("Register")
+            Text("Next")
         }
+    }
+}
+
+@Composable
+fun AccountInfoContainer(
+    viewModel: AuthViewModel,
+    onBack: () -> Unit,
+    onRegisterSuccess: () -> Unit
+) {
+    var confirmPassword by remember { mutableStateOf("") }
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        FormatedTextField(
+            value = viewModel.uiState.user.username,
+            label = "Username",
+            onValueChange = viewModel::onUsernameChange,
+        )
+        FormatedTextField(
+            value = viewModel.uiState.user.password,
+            label = "Password",
+            onValueChange = viewModel::onPasswordChange,
+            visualTransformation = PasswordVisualTransformation()
+
+        )
+        FormatedTextField(
+            value = confirmPassword,
+            label = "Confirm password",
+            onValueChange = {
+                confirmPassword = it
+                viewModel.onConfirmPasswordChange(it)
+            },
+            visualTransformation = PasswordVisualTransformation()
+        )
+        Row(horizontalArrangement = Arrangement.SpaceBetween) {
+            Button(
+                onClick = {
+                    onBack()
+                }, modifier = Modifier
+                    .padding(top = 50.dp, end = 50.dp)
+            ) {
+                Text("<- Prev")
+            }
+            Button(
+                enabled = viewModel.uiState.isValidate,
+                onClick = {
+                    viewModel.performRegister(object : ApiCallBack {
+                        override fun onSuccess() {
+                            onRegisterSuccess()
+                        }
+
+                        override fun onFailure(error: String) {
+                            Log.d(TAG, "onFailure: $error")
+                        }
+
+                    })
+                }, modifier = Modifier
+                    .padding(top = 50.dp, start = 50.dp)
+            ) {
+                Text("Register")
+            }
+        }
+
     }
 
 }
@@ -262,6 +336,7 @@ fun FormatedTextField(
     value: String,
     label: String,
     onValueChange: (String) -> Unit,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default
 ) {
     OutlinedTextField(
@@ -273,6 +348,7 @@ fun FormatedTextField(
         modifier = Modifier
             .fillMaxWidth()
             .padding(12.dp),
+        visualTransformation = visualTransformation,
         keyboardOptions = keyboardOptions
     )
 }

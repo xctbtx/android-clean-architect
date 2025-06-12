@@ -10,9 +10,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -31,12 +34,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.xctbtx.cleanarchitectsample.data.ApiCallBack
 import com.xctbtx.cleanarchitectsample.ui.auth.viewmodel.AuthViewModel
+import com.xctbtx.cleanarchitectsample.ui.main.viewmodel.MainViewModel
 
 const val TAG = "LoginScreen"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(onLoginSuccess: (String) -> Unit, onRegisterClick: () -> Unit) {
+fun LoginScreen(mVM: MainViewModel, onLoginSuccess: (String) -> Unit, onRegisterClick: () -> Unit) {
     val viewModel: AuthViewModel = hiltViewModel()
     val state = viewModel.uiState
     Scaffold(
@@ -64,7 +68,7 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit, onRegisterClick: () -> Unit) {
             }
 
             else -> {
-                LoginContainer(viewModel, padding, onLoginSuccess, onRegisterClick)
+                LoginContainer(viewModel, mVM, padding, onLoginSuccess, onRegisterClick)
             }
         }
     }
@@ -73,6 +77,7 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit, onRegisterClick: () -> Unit) {
 @Composable
 fun LoginContainer(
     viewModel: AuthViewModel,
+    mVM: MainViewModel,
     paddingValues: PaddingValues,
     onLoginSuccess: (String) -> Unit,
     onRegisterClick: () -> Unit
@@ -91,7 +96,12 @@ fun LoginContainer(
             singleLine = true,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp)
+                .padding(12.dp),
+            trailingIcon = {
+                Icon(Icons.Default.Lock, null, modifier = Modifier.clickable {
+                    mVM.loginWihBiometric({ userId -> }, { error -> })
+                })
+            }
         )
         OutlinedTextField(
             value = viewModel.uiState.user.password,
@@ -120,6 +130,7 @@ fun LoginContainer(
             },
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
+                .padding(top = 20.dp)
                 .clickable {
                     onRegisterClick()
                 })

@@ -32,6 +32,11 @@ class AuthViewModel @Inject constructor(
         uiState = uiState.copy(user = uiState.user.copy(password = password))
     }
 
+    fun onConfirmPasswordChange(confirmPass: String) {
+        val isValid = confirmPass == uiState.user.password
+        uiState = uiState.copy(isValidate = isValid)
+    }
+
     fun onFullNameChange(name: String) {
         uiState = uiState.copy(user = uiState.user.copy(name = name))
     }
