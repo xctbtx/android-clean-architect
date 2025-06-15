@@ -10,6 +10,7 @@ data class MessageDto(
     val content: String = "",
     val conversationId: String = "",
     val senderId: String = "",
+    val isSeen: Boolean = false,
     @get:ServerTimestamp
     var createdAt: Timestamp? = null
 )

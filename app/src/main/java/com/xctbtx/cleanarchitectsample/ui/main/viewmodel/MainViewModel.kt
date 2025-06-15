@@ -1,6 +1,5 @@
 package com.xctbtx.cleanarchitectsample.ui.main.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,7 +14,10 @@ class MainViewModel @Inject constructor() : ViewModel() {
     private val _event = MutableSharedFlow<UiEvent>()
     val event = _event.asSharedFlow()
 
+    var phoneNumber: String = ""
+
     fun onCallClick(number: String) {
+        phoneNumber = number
         viewModelScope.launch {
             _event.emit(UiEvent.RequestCall(number))
         }
@@ -35,12 +37,18 @@ class MainViewModel @Inject constructor() : ViewModel() {
         onResult: (String?) -> Unit,
         onError: (Throwable) -> Unit
     ) {
-        Log.d("TAG", "loginWihBiometric clicked ")
         viewModelScope.launch {
             _event.emit(UiEvent.LoginWithBiometric(onResult, onError))
         }
     }
 
+    fun checkBiometric(
+        onResult: (Boolean) -> Unit,
+    ) {
+        viewModelScope.launch {
+            _event.emit(UiEvent.CheckBiometric(onResult))
+        }
+    }
 
     sealed interface UiEvent {
         data class RequestCall(val phoneNumber: String) : UiEvent
@@ -56,5 +64,6 @@ class MainViewModel @Inject constructor() : ViewModel() {
         ) : UiEvent
 
         data class EndCall(val value: String) : UiEvent
+        data class CheckBiometric(val onResult: (Boolean) -> Unit) : UiEvent
     }
 }

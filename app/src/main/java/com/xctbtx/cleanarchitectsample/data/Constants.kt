@@ -10,8 +10,12 @@ object Constants {
     const val PHOTO_ENDPOINT = "/photos"
     const val USER_ENDPOINT = "/users"
 
+    const val NOTIFICATION_PATH = "notifications"
     const val CONVERSATION_PATH = "conversations"
     const val MESSAGE_PATH = "messages"
     const val USER_PATH = "users"
     const val ORDER_BY_PARAM = "createdAt"
+
+    const val CHANNEL_ID = "clean_architect_channel"
+    const val DEFAULT_NOTIFICATION_ID = 25071999
 }

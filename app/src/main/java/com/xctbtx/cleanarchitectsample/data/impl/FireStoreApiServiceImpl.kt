@@ -40,7 +40,7 @@ class FireStoreApiServiceImpl @Inject constructor(val api: FirebaseFirestore) :
         val registration = api.collection(Constants.CONVERSATION_PATH)
             .addSnapshotListener(MetadataChanges.INCLUDE) { snapshot, e ->
                 if (e != null) {
-                    Log.d(TAG, "syncConversations: failed", e)
+                    Log.d(TAG, "syncConversations: failed $e")
                     return@addSnapshotListener
                 }
                 if (snapshot != null) {

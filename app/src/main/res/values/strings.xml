@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Clean Architect</string>
+    <string name="channel_name">clean architect channel</string>
+    <string name="channel_description">Channel for post notification receive from FireStore</string>
 </resources>

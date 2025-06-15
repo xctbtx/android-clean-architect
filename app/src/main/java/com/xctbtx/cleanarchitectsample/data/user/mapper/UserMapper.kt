@@ -1,5 +1,6 @@
 package com.xctbtx.cleanarchitectsample.data.user.mapper
 
+import android.util.Log
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
 import com.xctbtx.cleanarchitectsample.data.user.dto.UserDto
@@ -31,6 +32,17 @@ object UserMapper {
             address = address,
             dob = dob,
             avatar = avatar.toString()
+        )
+    }
+
+    fun UserDto.toUiModel(): UserUiModel {
+        return UserUiModel(
+            id = id,
+            name = name,
+            username = username,
+            address = address,
+            avatar = avatar,
+            dob = dob,
         )
     }
 }

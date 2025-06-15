@@ -1,9 +1,7 @@
 package com.xctbtx.cleanarchitectsample.domain.auth.usecase
 
 import android.content.Context
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
@@ -12,26 +10,20 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.crypto.Cipher
 import javax.inject.Inject
 
-class BiometricLoginUseCase @Inject constructor(
+class SaveBiometricInfoUseCase @Inject constructor(
     @ApplicationContext val context: Context,
     private val authRepo: AuthenticationRepository
 ) {
     private val executor = ContextCompat.getMainExecutor(context)
 
-    @RequiresApi(Build.VERSION_CODES.R)
     operator fun invoke(
         activity: FragmentActivity,
-        onResult: (String?) -> Unit,
+        userId: String,
+        onSuccess: () -> Unit,
         onError: (Throwable) -> Unit
     ) {
-        val encryptedData = authRepo.loadEncryptedData()
-        if (encryptedData == null) {
-            onResult(null)
-            return
-        }
-
-        val cipher = authRepo.getCipher(Cipher.DECRYPT_MODE, encryptedData.iv)
-        val prompt = createPromptInfo("Login using fingerprint")
+        val cipher = authRepo.getCipher(Cipher.ENCRYPT_MODE)
+        val prompt = createPromptInfo()
 
         val biometricPrompt = BiometricPrompt(
             activity,
@@ -39,10 +31,12 @@ class BiometricLoginUseCase @Inject constructor(
             object : BiometricPrompt.AuthenticationCallback() {
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                     try {
-                        val decrypted = authRepo.decrypt(encryptedData.cipherText, encryptedData.iv)
-                        val userId = decrypted.toString()
-                        onResult(userId)
+                        val data = userId.toByteArray()
+                        val encrypted = authRepo.encrypt(data)
+                        authRepo.saveEncryptedData(encrypted)
+                        onSuccess()
                     } catch (e: Exception) {
+                        Log.e("TAG", "onAuthenticationSucceeded: $e")
                         onError(e)
                     }
                 }
@@ -55,9 +49,9 @@ class BiometricLoginUseCase @Inject constructor(
         biometricPrompt.authenticate(prompt, BiometricPrompt.CryptoObject(cipher))
     }
 
-    private fun createPromptInfo(title: String): BiometricPrompt.PromptInfo {
+    private fun createPromptInfo(): BiometricPrompt.PromptInfo {
         return BiometricPrompt.PromptInfo.Builder()
-            .setTitle(title)
+            .setTitle("Xác thực để lưu User ID")
             .setSubtitle("Xác thực bằng vân tay")
             .setNegativeButtonText("Huỷ")
             .build()
