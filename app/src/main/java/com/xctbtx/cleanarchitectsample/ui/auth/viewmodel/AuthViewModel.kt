@@ -70,8 +70,13 @@ class AuthViewModel @Inject constructor(
     }
 
     fun performLogin(callBack: ApiCallBack) {
+        val username = uiState.user.username
+        val password = uiState.user.password
+        if (username.trim().isEmpty() || password.trim()
+                .isEmpty()
+        ) callBack.onFailure("Invalid user/password")
         viewModelScope.launch {
-            val result = loginUseCase(uiState.user.username, uiState.user.password)
+            val result = loginUseCase(username, password)
             if (result != null) {
                 callBack.onSuccess()
                 uiState = uiState.copy(user = result.toUiModel())

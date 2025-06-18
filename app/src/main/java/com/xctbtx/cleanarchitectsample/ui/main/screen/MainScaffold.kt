@@ -8,15 +8,13 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.xctbtx.cleanarchitectsample.ui.main.viewmodel.MainViewModel
 import com.xctbtx.cleanarchitectsample.ui.navigation.AppNavGraph
 import com.xctbtx.cleanarchitectsample.ui.navigation.Conversation
+import com.xctbtx.cleanarchitectsample.ui.navigation.Login
 import com.xctbtx.cleanarchitectsample.ui.navigation.Menu
 import com.xctbtx.cleanarchitectsample.ui.navigation.Post
 
@@ -24,8 +22,8 @@ import com.xctbtx.cleanarchitectsample.ui.navigation.Post
 fun MainScaffold(viewModel: MainViewModel, modifier: Modifier = Modifier) {
     val navController = rememberNavController()
     val destinations = listOf(Post, Conversation, Menu)
-    val startDestination = destinations[0]
-    var selectedDestination by rememberSaveable { mutableStateOf(startDestination.label) }
+    val startDestination = Login
+    var selectedDestination = rememberSaveable { "conversation" }
     Scaffold(
         modifier = modifier,
         bottomBar = {
@@ -49,6 +47,11 @@ fun MainScaffold(viewModel: MainViewModel, modifier: Modifier = Modifier) {
             }
         }
     ) { contentPadding ->
-        AppNavGraph(viewModel, navController, startDestination, modifier = Modifier.padding(contentPadding))
+        AppNavGraph(
+            viewModel,
+            navController,
+            startDestination,
+            modifier = Modifier.padding(contentPadding)
+        )
     }
 }

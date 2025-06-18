@@ -159,7 +159,7 @@ class MainActivity : FragmentActivity(), OnRequestPermissionsResultCallback {
     @RequiresApi(Build.VERSION_CODES.R)
     private fun loginWithBiometric(
         onResult: (String?) -> Unit,
-        onError: (Throwable) -> Unit
+        onError: (String) -> Unit
     ) {
         biometricLoginUseCase(this, onResult, onError)
     }
@@ -167,14 +167,14 @@ class MainActivity : FragmentActivity(), OnRequestPermissionsResultCallback {
     private fun saveUserIdWithBiometric(
         userId: String,
         onSuccess: () -> Unit,
-        onError: (Throwable) -> Unit
+        onError: (String) -> Unit
     ) {
         saveBiometricInfoUseCase(this, userId, onSuccess, onError)
     }
 
     private fun performCall(number: String) {
         val uri = "tel:$number".toUri()
-        val telecomManager = getSystemService(Context.TELECOM_SERVICE) as TelecomManager
+        val telecomManager = getSystemService(TELECOM_SERVICE) as TelecomManager
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.CALL_PHONE

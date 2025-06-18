@@ -26,7 +26,7 @@ class MainViewModel @Inject constructor() : ViewModel() {
     fun saveUserId(
         userId: String,
         onSuccess: () -> Unit,
-        onError: (Throwable) -> Unit
+        onError: (String) -> Unit
     ) {
         viewModelScope.launch {
             _event.emit(UiEvent.SaveUserId(userId, onSuccess, onError))
@@ -35,7 +35,7 @@ class MainViewModel @Inject constructor() : ViewModel() {
 
     fun loginWihBiometric(
         onResult: (String?) -> Unit,
-        onError: (Throwable) -> Unit
+        onError: (String) -> Unit
     ) {
         viewModelScope.launch {
             _event.emit(UiEvent.LoginWithBiometric(onResult, onError))
@@ -55,12 +55,12 @@ class MainViewModel @Inject constructor() : ViewModel() {
         data class SaveUserId(
             val userId: String,
             val onSuccess: () -> Unit,
-            val onError: (Throwable) -> Unit
+            val onError: (String) -> Unit
         ) : UiEvent
 
         data class LoginWithBiometric(
             val onResult: (String?) -> Unit,
-            val onError: (Throwable) -> Unit
+            val onError: (String) -> Unit
         ) : UiEvent
 
         data class EndCall(val value: String) : UiEvent

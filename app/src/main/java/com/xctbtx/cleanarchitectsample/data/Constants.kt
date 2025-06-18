@@ -1,5 +1,7 @@
 package com.xctbtx.cleanarchitectsample.data
 
+import android.security.keystore.KeyProperties
+
 object Constants {
 
 
@@ -18,4 +20,6 @@ object Constants {
 
     const val CHANNEL_ID = "clean_architect_channel"
     const val DEFAULT_NOTIFICATION_ID = 25071999
+
+    const val ANDROID_KEY_STORE = "AndroidKeyStore"
 }

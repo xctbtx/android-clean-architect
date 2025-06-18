@@ -45,7 +45,7 @@ const val TAG = "LoginScreen"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(mVM: MainViewModel, onLoginSuccess: () -> Unit, onRegisterClick: () -> Unit) {
+fun LoginScreen(mVM: MainViewModel, onLoginSuccess: (String) -> Unit, onRegisterClick: () -> Unit) {
     val viewModel: AuthViewModel = hiltViewModel()
     val state = viewModel.uiState
     Scaffold(
@@ -87,9 +87,10 @@ fun LoginScreen(mVM: MainViewModel, onLoginSuccess: () -> Unit, onRegisterClick:
 }
 
 @Composable
-fun SimpleDialog(viewModel: AuthViewModel, mVM: MainViewModel, onLoginSuccess: () -> Unit) {
+fun SimpleDialog(viewModel: AuthViewModel, mVM: MainViewModel, onLoginSuccess: (String) -> Unit) {
     Column {
         if (viewModel.showDialog) {
+            val userId = viewModel.uiState.user.id
             AlertDialog(
                 onDismissRequest = { viewModel.hideDialog() },
                 title = { Text("Biometric supported") },
@@ -97,18 +98,21 @@ fun SimpleDialog(viewModel: AuthViewModel, mVM: MainViewModel, onLoginSuccess: (
                 confirmButton = {
                     TextButton(onClick = {
                         viewModel.hideDialog()
-                        mVM.saveUserId(viewModel.uiState.user.id, {
+                        mVM.saveUserId(userId, {
                             viewModel.showToast("Save user id success.")
-                            onLoginSuccess()
+                            onLoginSuccess(userId)
                         }, { e ->
-                            viewModel.showToast("Failed: ${e.cause}")
+                            viewModel.showToast("Failed: $e")
                         })
                     }) {
                         Text("Yes")
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { viewModel.hideDialog() }) {
+                    TextButton(onClick = {
+                        onLoginSuccess(userId)
+                        viewModel.hideDialog()
+                    }) {
                         Text("Skip")
                     }
                 }
@@ -122,7 +126,7 @@ fun LoginContainer(
     viewModel: AuthViewModel,
     mVM: MainViewModel,
     paddingValues: PaddingValues,
-    onLoginSuccess: () -> Unit,
+    onLoginSuccess: (String) -> Unit,
     onRegisterClick: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -132,7 +136,7 @@ fun LoginContainer(
                 is AuthViewModel.AuthUiCommand.ShowToast -> Toast.makeText(
                     context,
                     command.message,
-                    Toast.LENGTH_SHORT
+                    Toast.LENGTH_LONG
                 ).show()
             }
 
@@ -158,6 +162,8 @@ fun LoginContainer(
                     mVM.loginWihBiometric({ userId ->
                         if (userId == null) {
                             viewModel.onUserIdNull()
+                        } else {
+                            onLoginSuccess(userId)
                         }
                     }, { _ -> })
                 })
@@ -198,10 +204,9 @@ fun LoginContainer(
             onClick = {
                 viewModel.performLogin(object : ApiCallBack {
                     override fun onSuccess() {
-                        //Ask if save userId or not ?
                         mVM.checkBiometric { isAvailable ->
                             if (!isAvailable) {
-                                onLoginSuccess()
+                                onLoginSuccess(viewModel.uiState.user.id)
                             } else {
                                 viewModel.onBiometricAvailable()
                             }

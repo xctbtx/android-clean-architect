@@ -12,6 +12,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.xctbtx.cleanarchitectsample.data.Cache
 import com.xctbtx.cleanarchitectsample.ui.auth.screen.LoginScreen
 import com.xctbtx.cleanarchitectsample.ui.auth.screen.LoginScreen
 import com.xctbtx.cleanarchitectsample.ui.auth.screen.RegisterScreen
@@ -78,7 +79,8 @@ fun AppNavGraph(
             route = Login.route
         ) {
             LoginScreen(viewModel, onLoginSuccess = {
-                navController.navigateSingleTopTo(Post.route)
+                navController.navigateSingleTopTo(Conversation.route)
+                Cache.currentUserId = it
             }, onRegisterClick = {
                 navController.navigateSingleTopTo(Register.route)
             })

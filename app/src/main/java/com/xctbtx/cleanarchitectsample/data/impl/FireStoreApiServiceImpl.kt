@@ -106,9 +106,14 @@ class FireStoreApiServiceImpl @Inject constructor(val api: FirebaseFirestore) :
         val response = api.collection(Constants.USER_PATH)
             .whereEqualTo("username", username)
             .whereEqualTo("password", password)
-            .limit(1)
             .get().await()
-        return response.toUsersDto()?.first()
+        var result: UserDto? = null
+        try {
+            result = response.toUsersDto()?.first()
+        } catch (e: Exception) {
+
+        }
+        return result
     }
 
     override suspend fun signIn(payload: UserDto, password: String, callBack: ApiCallBack) {

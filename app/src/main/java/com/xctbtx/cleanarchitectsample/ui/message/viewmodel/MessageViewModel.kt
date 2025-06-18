@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.xctbtx.cleanarchitectsample.data.ApiCallBack
+import com.xctbtx.cleanarchitectsample.data.Cache
 import com.xctbtx.cleanarchitectsample.data.message.mapper.MessageMapper
 import com.xctbtx.cleanarchitectsample.domain.conversation.usecase.GetConversationUseCase
 import com.xctbtx.cleanarchitectsample.domain.message.model.Message
@@ -32,7 +33,7 @@ class MessageViewModel @Inject constructor(
     private val getConversationUseCase: GetConversationUseCase,
 ) : ViewModel() {
     //todo Need login function for this to be real
-    val currentUserId = "user1"
+    val currentUserId = Cache.currentUserId
 
     private var mConversationId: String = ""
 

@@ -1,6 +1,5 @@
 package com.xctbtx.cleanarchitectsample.data.user.mapper
 
-import android.util.Log
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
 import com.xctbtx.cleanarchitectsample.data.user.dto.UserDto
@@ -15,7 +14,7 @@ object UserMapper {
     fun QuerySnapshot.toUsersDto(): List<UserDto>? {
         val result: List<UserDto>? = try {
             this.map { it.toObject(UserDto::class.java).copy(id = it.id) }
-        } catch (e: AssertionError) {
+        } catch (e: Exception) {
             null
         }
         return result

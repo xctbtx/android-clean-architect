@@ -2,10 +2,14 @@ package com.xctbtx.cleanarchitectsample.data.auth
 
 import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
-import android.security.keystore.KeyProperties
-import android.util.Log
-import androidx.annotation.RequiresApi
+import android.security.keystore.KeyProperties.AUTH_BIOMETRIC_STRONG
+import android.security.keystore.KeyProperties.KEY_ALGORITHM_AES
+import android.security.keystore.KeyProperties.BLOCK_MODE_CBC
+import android.security.keystore.KeyProperties.ENCRYPTION_PADDING_PKCS7
+import android.security.keystore.KeyProperties.PURPOSE_DECRYPT
+import android.security.keystore.KeyProperties.PURPOSE_ENCRYPT
 import com.xctbtx.cleanarchitectsample.data.ApiCallBack
+import com.xctbtx.cleanarchitectsample.data.Constants
 import com.xctbtx.cleanarchitectsample.data.SecureStorage
 import com.xctbtx.cleanarchitectsample.data.api.FireStoreApiService
 import com.xctbtx.cleanarchitectsample.data.user.dto.UserDto
@@ -15,7 +19,6 @@ import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
-import javax.crypto.spec.IvParameterSpec
 import javax.inject.Inject
 
 class AuthenticationRepositoryImpl @Inject constructor(
@@ -37,24 +40,6 @@ class AuthenticationRepositoryImpl @Inject constructor(
         api.signIn(payload, password, callBack)
     }
 
-    @RequiresApi(Build.VERSION_CODES.R)
-    override fun encrypt(data: ByteArray): EncryptedData {
-        var result = EncryptedData(byteArrayOf(), byteArrayOf())
-        val cipher = getCipher(Cipher.ENCRYPT_MODE)
-        try {
-            val encrypted = cipher.doFinal(data)
-            result = EncryptedData(encrypted, cipher.iv)
-        } catch (e: Exception) {
-            Log.e("TAG", "encrypt: ${e.printStackTrace()}")
-        }
-        return result
-    }
-
-    @RequiresApi(Build.VERSION_CODES.R)
-    override fun decrypt(data: ByteArray, iv: ByteArray): ByteArray {
-        val cipher = getCipher(Cipher.DECRYPT_MODE, iv)
-        return cipher.doFinal(data)
-    }
 
     override fun loadEncryptedData(): EncryptedData? {
         return secureStorage.loadEncryptedData()
@@ -65,46 +50,45 @@ class AuthenticationRepositoryImpl @Inject constructor(
     }
 
 
-    @RequiresApi(Build.VERSION_CODES.R)
-    override fun getCipher(mode: Int, iv: ByteArray?): Cipher {
-        val keyStore = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
-        val key = keyStore.getKey(keyAlias, null) as? SecretKey ?: generateKey()
-        val cipher = Cipher.getInstance(
-            KeyProperties.KEY_ALGORITHM_AES + "/"
-                    + KeyProperties.BLOCK_MODE_CBC + "/"
-                    + KeyProperties.ENCRYPTION_PADDING_PKCS7
-        )
-        if (mode == Cipher.ENCRYPT_MODE) {
-            cipher.init(mode, key)
-        } else {
-            cipher.init(mode, key, IvParameterSpec(iv))
-        }
+    override fun getCipher(): Cipher {
+        val cipher =
+            Cipher.getInstance("${KEY_ALGORITHM_AES}/${BLOCK_MODE_CBC}/${ENCRYPTION_PADDING_PKCS7}")
         return cipher
     }
 
-    @RequiresApi(Build.VERSION_CODES.R)
     private fun generateKey(): SecretKey {
-        val keyGen = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore")
-        val paramSpec = KeyGenParameterSpec.Builder(
+        val keyGen =
+            KeyGenerator.getInstance(KEY_ALGORITHM_AES, Constants.ANDROID_KEY_STORE)
+        val pBuilder = KeyGenParameterSpec.Builder(
             keyAlias,
-            KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+            PURPOSE_ENCRYPT or PURPOSE_DECRYPT
         )
-            .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
-            .setEncryptionPaddings(
-                KeyProperties.ENCRYPTION_PADDING_PKCS7,
-                KeyProperties.ENCRYPTION_PADDING_RSA_OAEP,
-                KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1,
-                KeyProperties.ENCRYPTION_PADDING_NONE
-            )
+            .setBlockModes(BLOCK_MODE_CBC)
+            .setEncryptionPaddings(ENCRYPTION_PADDING_PKCS7)
             .setUserAuthenticationRequired(true)
-            .setUserAuthenticationParameters(
+        if (Build.VERSION.SDK_INT >= 30) {
+            pBuilder.setUserAuthenticationParameters(
                 0,
-                KeyProperties.AUTH_BIOMETRIC_STRONG
+                AUTH_BIOMETRIC_STRONG
             )
-            .build()
-
-        keyGen.init(paramSpec)
+        } else {
+            @Suppress("DEPRECATION")
+            pBuilder.setUserAuthenticationValidityDurationSeconds(0)
+        }
+        keyGen.init(pBuilder.build())
         return keyGen.generateKey()
     }
 
+    override fun getSecretKey(): SecretKey {
+        val keyStore = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
+        return keyStore.getKey(keyAlias, null) as? SecretKey ?: generateKey()
+    }
+
+    override fun generateSecretKey() {
+        generateSecretKey()
+    }
+
+    companion object {
+        const val TAG = "AuthenticationRepositoryImpl"
+    }
 }
