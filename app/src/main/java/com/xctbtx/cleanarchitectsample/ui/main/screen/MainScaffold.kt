@@ -8,7 +8,6 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.xctbtx.cleanarchitectsample.ui.main.viewmodel.MainViewModel
@@ -23,17 +22,17 @@ fun MainScaffold(viewModel: MainViewModel, modifier: Modifier = Modifier) {
     val navController = rememberNavController()
     val destinations = listOf(Post, Conversation, Menu)
     val startDestination = Login
-    var selectedDestination = rememberSaveable { "conversation" }
+    val currentDes = viewModel.curDesIndex
     Scaffold(
         modifier = modifier,
         bottomBar = {
             NavigationBar(windowInsets = NavigationBarDefaults.windowInsets) {
                 destinations.forEachIndexed { index, destination ->
                     NavigationBarItem(
-                        selected = selectedDestination == destinations[index].label,
+                        selected = currentDes == index,
                         onClick = {
                             navController.navigate(route = destination.route)
-                            selectedDestination = destinations[index].label
+                            viewModel.onDestinationChange(index)
                         },
                         icon = {
                             Icon(

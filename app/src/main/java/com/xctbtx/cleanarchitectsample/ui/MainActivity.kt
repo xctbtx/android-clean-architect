@@ -67,8 +67,10 @@ class MainActivity : FragmentActivity(), OnRequestPermissionsResultCallback {
     }
 
     private val contracts = object : ActivityResultContract<Any?, Boolean>() {
-        @RequiresApi(Build.VERSION_CODES.R)
         override fun createIntent(context: Context, input: Any?): Intent {
+            if(Build.VERSION.SDK_INT < 30){
+                return Intent()
+            }
             val enrollIntent = Intent(Settings.ACTION_BIOMETRIC_ENROLL).apply {
                 putExtra(
                     Settings.EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED,
@@ -125,7 +127,6 @@ class MainActivity : FragmentActivity(), OnRequestPermissionsResultCallback {
         return result
     }
 
-    @RequiresApi(Build.VERSION_CODES.R)
     private fun observeEvents() {
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -156,7 +157,6 @@ class MainActivity : FragmentActivity(), OnRequestPermissionsResultCallback {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.R)
     private fun loginWithBiometric(
         onResult: (String?) -> Unit,
         onError: (String) -> Unit

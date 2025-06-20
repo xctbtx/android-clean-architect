@@ -12,7 +12,7 @@ interface AuthenticationRepository {
     fun saveEncryptedData(data: EncryptedData)
     fun getCipher(): Cipher
     fun getSecretKey(): SecretKey
-    fun generateSecretKey()
+    fun generateKey(): SecretKey
 }
 
 data class EncryptedData(

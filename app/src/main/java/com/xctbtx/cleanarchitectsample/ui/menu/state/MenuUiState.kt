@@ -1,4 +1,8 @@
 package com.xctbtx.cleanarchitectsample.ui.menu.state
 
-class MenuUiState {
-}
+import com.xctbtx.cleanarchitectsample.ui.common.state.CommonUiState
+
+class MenuUiState(
+    override val isLoading: Boolean = false,
+    override val error: String? = null
+) : CommonUiState

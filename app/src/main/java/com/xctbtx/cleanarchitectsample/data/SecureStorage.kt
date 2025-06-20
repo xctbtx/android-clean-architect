@@ -11,7 +11,7 @@ import javax.inject.Singleton
 @Singleton
 class SecureStorage @Inject constructor(@ApplicationContext context: Context) {
 
-    private val prefs = context.getSharedPreferences("secure_prefs", Context.MODE_PRIVATE)
+    private val prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE)
 
     fun saveEncryptedData(data: EncryptedData) {
         prefs.edit {
@@ -29,5 +29,15 @@ class SecureStorage @Inject constructor(@ApplicationContext context: Context) {
                 Base64.decode(iv, Base64.DEFAULT)
             )
         } else null
+    }
+
+    fun saveIsBioLogin(isBiometric: Boolean) {
+        prefs.edit {
+            putBoolean(Constants.PREF_LOGIN_METHOD, isBiometric)
+        }
+    }
+
+    fun getIsBioLogin(): Boolean {
+        return prefs.getBoolean(Constants.PREF_LOGIN_METHOD, false)
     }
 }

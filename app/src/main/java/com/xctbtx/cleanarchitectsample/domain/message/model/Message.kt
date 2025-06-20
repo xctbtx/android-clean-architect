@@ -7,5 +7,5 @@ data class Message(
     val content: String = "",
     val createdAt: Timestamp? = null,
     val conversationId: String = "",
-    val senderId: String = ""
+    val senderId: String? = null
 )

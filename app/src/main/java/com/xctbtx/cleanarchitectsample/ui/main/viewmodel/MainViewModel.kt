@@ -1,5 +1,9 @@
 package com.xctbtx.cleanarchitectsample.ui.main.viewmodel
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,6 +19,7 @@ class MainViewModel @Inject constructor() : ViewModel() {
     val event = _event.asSharedFlow()
 
     var phoneNumber: String = ""
+    var curDesIndex by mutableIntStateOf(1)
 
     fun onCallClick(number: String) {
         phoneNumber = number
@@ -48,6 +53,10 @@ class MainViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launch {
             _event.emit(UiEvent.CheckBiometric(onResult))
         }
+    }
+
+    fun onDestinationChange(index: Int) {
+        curDesIndex = index
     }
 
     sealed interface UiEvent {

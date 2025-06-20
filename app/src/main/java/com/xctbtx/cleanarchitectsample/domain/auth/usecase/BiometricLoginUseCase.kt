@@ -67,7 +67,8 @@ class BiometricLoginUseCase @Inject constructor(
         } catch (_: InvalidKeyException) {
             onError("Key is invalid")
             Log.e(TAG, "Key is invalid.")
-            authRepo.getSecretKey()
+            //authRepo.generateKey()
+            //TODO: generate new key to use
             this.invoke(activity, onResult, onError)
         } catch (_: UserNotAuthenticatedException) {
             Log.d(TAG, "The key's validity timed out.")

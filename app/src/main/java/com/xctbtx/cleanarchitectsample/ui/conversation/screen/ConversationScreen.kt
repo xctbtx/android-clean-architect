@@ -1,8 +1,5 @@
 package com.xctbtx.cleanarchitectsample.ui.conversation.screen
 
-import android.content.Context
-import android.net.Uri
-import android.telecom.TelecomManager
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -36,13 +33,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.xctbtx.cleanarchitectsample.R
 import com.xctbtx.cleanarchitectsample.domain.conversation.model.Conversation
 import com.xctbtx.cleanarchitectsample.ui.conversation.viewmodel.ConversationViewModel
-import androidx.core.net.toUri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

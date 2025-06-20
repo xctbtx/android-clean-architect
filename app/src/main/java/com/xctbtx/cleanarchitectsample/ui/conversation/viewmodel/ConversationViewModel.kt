@@ -1,14 +1,11 @@
 package com.xctbtx.cleanarchitectsample.ui.conversation.viewmodel
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.xctbtx.cleanarchitectsample.domain.conversation.model.Conversation
 import com.xctbtx.cleanarchitectsample.domain.conversation.usecase.GetConversationsUseCase
 import com.xctbtx.cleanarchitectsample.domain.conversation.usecase.SyncConversationUseCase
+import com.xctbtx.cleanarchitectsample.ui.common.viewmodel.CommonViewModel
 import com.xctbtx.cleanarchitectsample.ui.conversation.state.ConversationUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -18,10 +15,7 @@ import javax.inject.Inject
 class ConversationViewModel @Inject constructor(
     private val getConversationsUseCase: GetConversationsUseCase,
     private val syncConversationUseCase: SyncConversationUseCase
-) : ViewModel() {
-
-    var uiState by mutableStateOf(ConversationUiState())
-        private set
+) : CommonViewModel<ConversationUiState, Any>(ConversationUiState()) {
 
     init {
         loadConversations()

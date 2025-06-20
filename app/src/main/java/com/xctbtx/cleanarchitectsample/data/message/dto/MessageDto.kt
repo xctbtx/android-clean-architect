@@ -9,7 +9,7 @@ data class MessageDto(
     val id: String? = null,
     val content: String = "",
     val conversationId: String = "",
-    val senderId: String = "",
+    val senderId: String? = null,
     val isSeen: Boolean = false,
     @get:ServerTimestamp
     var createdAt: Timestamp? = null

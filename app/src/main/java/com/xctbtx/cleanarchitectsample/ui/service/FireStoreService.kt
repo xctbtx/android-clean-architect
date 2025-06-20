@@ -83,8 +83,8 @@ class FireStoreService @Inject constructor(private val apiService: FireStoreApiS
     }
 
     private fun getNotification(
-        title: String,
-        content: String,
+        title: String?,
+        content: String?,
         autoCancel: Boolean = false
     ): NotificationCompat.Builder {
         return NotificationCompat.Builder(this, Constants.CHANNEL_ID)

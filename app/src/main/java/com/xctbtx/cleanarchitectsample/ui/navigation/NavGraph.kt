@@ -1,9 +1,9 @@
 package com.xctbtx.cleanarchitectsample.ui.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.outlined.Email
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -13,7 +13,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.xctbtx.cleanarchitectsample.data.Cache
-import com.xctbtx.cleanarchitectsample.ui.auth.screen.LoginScreen
 import com.xctbtx.cleanarchitectsample.ui.auth.screen.LoginScreen
 import com.xctbtx.cleanarchitectsample.ui.auth.screen.RegisterScreen
 import com.xctbtx.cleanarchitectsample.ui.conversation.screen.ConversationScreen
@@ -25,7 +24,7 @@ import com.xctbtx.cleanarchitectsample.ui.navigation.NavHelper.navigateSingleTop
 import com.xctbtx.cleanarchitectsample.ui.navigation.NavHelper.navigateToSingleConversation
 import com.xctbtx.cleanarchitectsample.ui.phone.screen.DialerScreen
 import com.xctbtx.cleanarchitectsample.ui.post.screen.PostScreen
-import com.xctbtx.cleanarchitectsample.ui.user.screen.UsersScreen
+import com.xctbtx.cleanarchitectsample.ui.profile.screen.ProfileScreen
 
 @Composable
 fun AppNavGraph(
@@ -55,14 +54,14 @@ fun AppNavGraph(
                     navController.navigate(Dialer.route)
                 },
                 toProfileScreen = {
-                    navController.navigateSingleTopTo(Login.route)
+                    navController.navigateSingleTopTo(Profile.route)
                 })
         }
         composable(route = NewConversation.route) {
             NewConversationScreen()
         }
-        composable(route = User.route) {
-            UsersScreen()
+        composable(route = Profile.route) {
+            ProfileScreen { navController.navigateSingleTopTo(Login.route) }
         }
         composable(route = Post.route) {
             PostScreen()
@@ -117,7 +116,7 @@ object Conversation : BottomDestination {
     override val route = "conversation"
     override val label = "Chats"
     override val contentDescription = "Chats"
-    override val icon = Icons.Outlined.Email
+    override val icon = Icons.Default.Email
 }
 
 object Post : BottomDestination {
@@ -151,8 +150,8 @@ object NewConversation : Destination {
     override val route = "new_conversation"
 }
 
-object User : Destination {
-    override val route = "user"
+object Profile : Destination {
+    override val route = "profile"
 }
 
 object Login : Destination {

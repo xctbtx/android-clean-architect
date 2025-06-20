@@ -124,7 +124,7 @@ fun MessageScreen(
 @Composable
 fun MessageList(
     messages: List<MessageUiModel>,
-    currentUserId: String,
+    currentUserId: String?,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(

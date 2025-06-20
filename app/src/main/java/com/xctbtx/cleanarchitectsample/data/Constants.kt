@@ -1,7 +1,5 @@
 package com.xctbtx.cleanarchitectsample.data
 
-import android.security.keystore.KeyProperties
-
 object Constants {
 
 
@@ -22,4 +20,7 @@ object Constants {
     const val DEFAULT_NOTIFICATION_ID = 25071999
 
     const val ANDROID_KEY_STORE = "AndroidKeyStore"
+
+    const val PREF_NAME = "secure_prefs"
+    const val PREF_LOGIN_METHOD = "login_method"
 }

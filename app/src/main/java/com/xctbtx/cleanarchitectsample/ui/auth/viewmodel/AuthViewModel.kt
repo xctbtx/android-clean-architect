@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.xctbtx.cleanarchitectsample.data.ApiCallBack
 import com.xctbtx.cleanarchitectsample.data.user.mapper.UserMapper.toDto
@@ -13,9 +12,8 @@ import com.xctbtx.cleanarchitectsample.data.user.mapper.UserMapper.toUiModel
 import com.xctbtx.cleanarchitectsample.domain.auth.usecase.LoginUseCase
 import com.xctbtx.cleanarchitectsample.domain.auth.usecase.RegisterUseCase
 import com.xctbtx.cleanarchitectsample.ui.auth.state.AuthUiState
+import com.xctbtx.cleanarchitectsample.ui.common.viewmodel.CommonViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,12 +21,7 @@ import javax.inject.Inject
 class AuthViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
     private val registerUseCase: RegisterUseCase,
-) : ViewModel() {
-    var uiState by mutableStateOf(AuthUiState())
-        private set
-
-    private val _command = MutableSharedFlow<AuthUiCommand>()
-    val command = _command.asSharedFlow()
+) : CommonViewModel<AuthUiState, AuthViewModel.AuthUiCommand>(AuthUiState()) {
 
     var showDialog by mutableStateOf(false)
         private set
@@ -61,7 +54,6 @@ class AuthViewModel @Inject constructor(
     }
 
     fun onDobChange(dob: String) {
-        Log.d("TAG", "onDobChange: ")
         uiState = uiState.copy(user = uiState.user.copy(dob = dob))
     }
 

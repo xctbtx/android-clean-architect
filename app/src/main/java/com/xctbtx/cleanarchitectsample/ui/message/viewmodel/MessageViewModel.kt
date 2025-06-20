@@ -15,6 +15,7 @@ import com.xctbtx.cleanarchitectsample.domain.message.usecase.GetMessageUseCase
 import com.xctbtx.cleanarchitectsample.domain.message.usecase.SendMessageUseCase
 import com.xctbtx.cleanarchitectsample.domain.message.usecase.SyncMessageUseCase
 import com.xctbtx.cleanarchitectsample.domain.user.usecase.GetUserAvatarUseCase
+import com.xctbtx.cleanarchitectsample.ui.common.viewmodel.CommonViewModel
 import com.xctbtx.cleanarchitectsample.ui.conversation.viewmodel.ConversationViewModel.Companion.TAG
 import com.xctbtx.cleanarchitectsample.ui.message.model.MessageUiModel
 import com.xctbtx.cleanarchitectsample.ui.message.state.MessageUiState
@@ -31,7 +32,7 @@ class MessageViewModel @Inject constructor(
     private val getUserAvatar: GetUserAvatarUseCase,
     private val sendMessageUseCase: SendMessageUseCase,
     private val getConversationUseCase: GetConversationUseCase,
-) : ViewModel() {
+) : CommonViewModel<MessageUiState, Any>(MessageUiState()) {
     //todo Need login function for this to be real
     val currentUserId = Cache.currentUserId
 
@@ -45,9 +46,6 @@ class MessageViewModel @Inject constructor(
     }
 
     private var avatarMap = mapOf<String, String>()
-
-    var uiState by mutableStateOf(MessageUiState())
-        private set
 
     fun loadMessages(conversationId: String) {
         Log.d(TAG, "loadMessages: $conversationId")

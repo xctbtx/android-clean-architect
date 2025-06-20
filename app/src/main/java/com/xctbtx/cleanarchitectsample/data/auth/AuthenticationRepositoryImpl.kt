@@ -56,7 +56,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
         return cipher
     }
 
-    private fun generateKey(): SecretKey {
+    override fun generateKey(): SecretKey {
         val keyGen =
             KeyGenerator.getInstance(KEY_ALGORITHM_AES, Constants.ANDROID_KEY_STORE)
         val pBuilder = KeyGenParameterSpec.Builder(
@@ -82,10 +82,6 @@ class AuthenticationRepositoryImpl @Inject constructor(
     override fun getSecretKey(): SecretKey {
         val keyStore = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
         return keyStore.getKey(keyAlias, null) as? SecretKey ?: generateKey()
-    }
-
-    override fun generateSecretKey() {
-        generateSecretKey()
     }
 
     companion object {
